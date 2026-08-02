@@ -1,0 +1,3422 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mirapp-eg</title>
+<style>
+/* ============================================================
+   style.css
+   Design language: "Harbor" — a control-tower feel for a B2B
+   valet/parking/hospitality sales team. Deep slate-navy base
+   (not pure black), a teal signal color standing in for radar
+   pings / tracked vehicles, amber for attention states. Inter
+   for UI text, a slightly condensed display cut for numbers.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@500;600&display=swap');
+
+:root {
+  --bg: #0F131C;
+  --bg-elevated: #161C29;
+  --panel: #171E2C;
+  --panel-2: #1D2536;
+  --border: #262f42;
+  --text: #E7EAF2;
+  --text-muted: #8b93a7;
+  --text-dim: #5c6478;
+  --accent: #3EB6A0;
+  --accent-strong: #35A18E;
+  --accent-2: #F2A65A;
+  --danger: #E0654F;
+  --good: #5FCB93;
+  --warn: #F2A65A;
+  --radius: 10px;
+  --shadow: 0 8px 24px rgba(0,0,0,0.35);
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'Roboto Mono', monospace;
+}
+
+html[data-theme="light"] {
+  --bg: #F3F5F9;
+  --bg-elevated: #FFFFFF;
+  --panel: #FFFFFF;
+  --panel-2: #F7F8FB;
+  --border: #E2E6EF;
+  --text: #171B26;
+  --text-muted: #626b80;
+  --text-dim: #9aa2b5;
+  --accent: #17967F;
+  --accent-strong: #0F7C69;
+  --accent-2: #C97A2E;
+  --danger: #C6432E;
+  --good: #1E9A5E;
+  --warn: #C97A2E;
+  --shadow: 0 6px 18px rgba(30,40,60,0.08);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  transition: background .2s ease, color .2s ease;
+}
+
+::selection { background: var(--accent); color: #0a0d13; }
+
+/* ---------- App shell ---------- */
+.app-shell {
+  display: grid;
+  grid-template-columns: 236px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  background: var(--bg-elevated);
+  border-right: 1px solid var(--border);
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px 22px;
+}
+.brand-mark {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; color: #0a0d13; font-size: 14px;
+  flex-shrink: 0;
+}
+.brand-name { font-weight: 700; font-size: 15px; letter-spacing: .2px; }
+.brand-sub { font-size: 10.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .08em; }
+
+.nav-item {
+  display: flex; align-items: center; gap: 11px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 500;
+  user-select: none;
+  transition: background .12s ease, color .12s ease;
+}
+.nav-item:hover { background: var(--panel-2); color: var(--text); }
+.nav-item.active { background: var(--accent); color: #0a0d13; font-weight: 600; }
+.nav-icon { width: 18px; text-align: center; font-size: 14px; }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 10px;
+  font-size: 11px;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+/* ---------- Topbar ---------- */
+.topbar {
+  height: 62px;
+  display: flex; align-items: center; gap: 14px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-elevated);
+  position: sticky; top: 0; z-index: 10;
+}
+.search-wrap { flex: 1; max-width: 420px; position: relative; }
+.search-wrap input {
+  width: 100%; padding: 9px 12px 9px 34px;
+  border-radius: 8px; border: 1px solid var(--border);
+  background: var(--panel-2); color: var(--text); font-size: 13.5px;
+}
+.search-wrap::before {
+  content: '🔍'; position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  font-size: 12px; opacity: .6;
+}
+.topbar-actions { display: flex; gap: 8px; align-items: center; margin-left: auto; }
+
+.btn {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  transition: transform .08s ease, background .12s ease, border-color .12s ease;
+  white-space: nowrap;
+}
+.btn:active { transform: scale(.97); }
+.btn-primary { background: var(--accent); color: #0a0d13; }
+.btn-primary:hover { background: var(--accent-strong); }
+.btn-ghost { background: transparent; border-color: var(--border); color: var(--text); }
+.btn-ghost:hover { background: var(--panel-2); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { filter: brightness(1.08); }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.icon-btn-round {
+  width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--panel-2); color: var(--text); cursor: pointer; font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+}
+.icon-btn-round:hover { background: var(--panel); }
+
+/* ---------- Main content ---------- */
+main#main { padding: 26px 28px 60px; max-width: 1400px; }
+.view-header { margin-bottom: 20px; }
+.view-header.row { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px; }
+.view-header h1 { font-size: 22px; font-weight: 800; margin: 0 0 4px; letter-spacing: -.01em; }
+.view-header .sub { color: var(--text-muted); font-size: 13px; margin: 0; }
+.header-actions { display: flex; gap: 8px; }
+
+/* ---------- KPI cards ---------- */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.kpi-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 16px 14px;
+  animation: rise .35s ease both;
+}
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.kpi-icon { font-size: 16px; opacity: .8; margin-bottom: 8px; }
+.kpi-value { font-family: var(--font-mono); font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
+.kpi-value.good { color: var(--good); }
+.kpi-value.bad { color: var(--danger); }
+.kpi-value.warn { color: var(--warn); }
+.kpi-label { color: var(--text-muted); font-size: 12px; margin-top: 4px; font-weight: 500; }
+
+/* ---------- Panels / charts ---------- */
+.chart-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 14px; }
+.bottom-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px; }
+.settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.followup-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.panel h3 { margin: 0 0 14px; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.panel-desc { color: var(--text-muted); font-size: 12.5px; line-height: 1.5; margin: 0 0 14px; }
+.team-add-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.team-add-row input {
+  flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--panel-2); color: var(--text); font-size: 13px; font-family: var(--font-ui);
+}
+.team-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
+.team-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 10px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--border);
+  font-size: 13px;
+}
+.team-empty { color: var(--text-dim); font-size: 12.5px; padding: 6px 2px; }
+.count-badge { background: var(--panel-2); border-radius: 20px; padding: 1px 8px; font-size: 11px; color: var(--text-muted); font-weight: 600; }
+
+@media (max-width: 1100px) {
+  .chart-grid, .bottom-grid, .followup-grid { grid-template-columns: 1fr; }
+}
+
+/* ---------- Save status & last updated (top bar) ---------- */
+.save-status {
+  display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-muted);
+  padding: 7px 11px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--border);
+  white-space: nowrap;
+}
+.save-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--good); flex-shrink: 0; transition: background .2s ease; }
+.save-dot.saving { background: var(--warn); animation: save-pulse 1s ease-in-out infinite; }
+.save-dot.saved { background: var(--good); }
+.save-dot.error { background: var(--danger); }
+@keyframes save-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+.last-updated { font-size: 11.5px; color: var(--text-dim); white-space: nowrap; }
+.last-updated b { color: var(--text-muted); font-weight: 600; }
+.ver-badge { font-size: 11px; color: var(--text-dim); font-weight: 500; margin-left: 6px; vertical-align: middle; }
+@media (max-width: 1240px) { .last-updated { display: none; } }
+@media (max-width: 980px) { .save-status span:not(.save-dot) { display: none; } }
+
+/* ---------- History / Activity Log ---------- */
+.history-list { display: flex; flex-direction: column; gap: 10px; }
+.history-card { display: flex; gap: 14px; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+.hist-time { width: 82px; flex-shrink: 0; font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); }
+.hist-time-sub { color: var(--text-dim); font-size: 11px; margin-top: 2px; }
+.hist-body { flex: 1; min-width: 0; }
+.hist-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 7px; }
+.hist-entity { font-weight: 600; font-size: 13px; }
+.hist-badge.badge-create { background: rgba(95,203,147,.15); color: var(--good); border-color: transparent; }
+.hist-badge.badge-update { background: rgba(62,182,160,.12); color: var(--accent); border-color: transparent; }
+.hist-badge.badge-delete { background: rgba(224,101,79,.14); color: var(--danger); border-color: transparent; }
+.hist-badge.badge-restore, .hist-badge.badge-undo { background: rgba(242,166,90,.14); color: var(--warn); border-color: transparent; }
+.hist-badge.badge-import, .hist-badge.badge-export, .hist-badge.badge-settings { background: var(--panel-2); color: var(--text-muted); }
+.hist-diffs { display: flex; flex-direction: column; gap: 4px; margin-bottom: 9px; }
+.hist-diff { display: flex; align-items: baseline; gap: 8px; font-size: 12.5px; flex-wrap: wrap; }
+.hist-diff-field { color: var(--text-muted); min-width: 120px; font-weight: 600; }
+.hist-diff-old { color: var(--text-dim); text-decoration: line-through; }
+.hist-diff-arrow { color: var(--text-dim); }
+.hist-diff-new { color: var(--text); font-weight: 600; }
+.hist-msg { font-size: 13px; color: var(--text-muted); margin-bottom: 9px; }
+.hist-fulldata { margin: 0 0 10px; }
+.hist-fulldata summary {
+  cursor: pointer; font-size: 12px; font-weight: 600; color: var(--accent);
+  user-select: none; list-style: none;
+}
+.hist-fulldata summary::-webkit-details-marker { display: none; }
+.hist-fulldata summary::before { content: '▸ '; }
+.hist-fulldata[open] summary::before { content: '▾ '; }
+.hist-fulldata-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 6px 16px; margin-top: 10px; padding: 12px; border-radius: 8px;
+  background: var(--panel-2); border: 1px solid var(--border);
+}
+.hist-fulldata-row { display: flex; flex-direction: column; gap: 1px; font-size: 12px; }
+.hist-fulldata-label { color: var(--text-dim); font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; }
+.hist-fulldata-value { color: var(--text); word-break: break-word; }
+.hist-foot { display: flex; align-items: center; gap: 10px; }
+.hist-id { font-size: 11px; color: var(--text-dim); font-family: var(--font-mono); }
+
+/* ---------- Activity feed ---------- */
+.activity-list { display: flex; flex-direction: column; gap: 12px; max-height: 340px; overflow-y: auto; }
+.activity-row { display: flex; gap: 10px; align-items: flex-start; }
+.activity-row .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-top: 6px; flex-shrink: 0; }
+.activity-msg { font-size: 13px; }
+.activity-time { font-size: 11px; color: var(--text-dim); margin-top: 1px; }
+.empty-hint { color: var(--text-dim); font-size: 12.5px; }
+
+.quick-actions { display: flex; flex-direction: column; gap: 8px; }
+.quick-actions .btn { width: 100%; text-align: center; }
+
+/* ---------- Filter bar ---------- */
+.filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.filter-select {
+  padding: 7px 10px; border-radius: 7px; border: 1px solid var(--border);
+  background: var(--panel-2); color: var(--text); font-size: 12.5px; font-family: var(--font-ui);
+}
+
+/* ---------- Data table ---------- */
+.table-wrap { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); overflow: auto; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th {
+  text-align: left; padding: 11px 14px; color: var(--text-muted); font-weight: 600;
+  font-size: 11.5px; text-transform: uppercase; letter-spacing: .04em;
+  border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--panel); white-space: nowrap;
+}
+.data-table th.sortable { cursor: pointer; user-select: none; }
+.data-table th.sortable:hover { color: var(--text); }
+.data-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--panel-2); }
+.cell-main { font-weight: 600; }
+.cell-sub { font-size: 11.5px; color: var(--text-dim); margin-top: 1px; }
+.empty-cell { text-align: center; padding: 44px 20px !important; color: var(--text-muted); }
+.empty-cell a { color: var(--accent); cursor: pointer; }
+.row-actions { display: flex; gap: 4px; white-space: nowrap; }
+.icon-btn {
+  border: none; background: transparent; color: var(--text-muted); cursor: pointer;
+  padding: 5px 7px; border-radius: 6px; font-size: 13px;
+}
+.icon-btn:hover { background: var(--panel-2); color: var(--text); }
+.text-danger { color: var(--danger); }
+.text-warn { color: var(--warn); }
+
+/* ---------- Chips ---------- */
+.chip {
+  display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px;
+  font-weight: 600; background: var(--panel-2); border: 1px solid var(--border); color: var(--text-muted);
+}
+.chip.stage { background: rgba(62,182,160,.12); color: var(--accent); border-color: transparent; }
+.chip.prio-High { background: rgba(224,101,79,.14); color: var(--danger); border-color: transparent; }
+.chip.prio-Medium { background: rgba(242,166,90,.14); color: var(--warn); border-color: transparent; }
+.chip.prio-Low { background: rgba(139,147,167,.14); color: var(--text-muted); border-color: transparent; }
+.chip.status-Client { background: rgba(95,203,147,.15); color: var(--good); border-color: transparent; }
+.chip.status-QualifiedLead { background: rgba(62,182,160,.15); color: var(--accent); border-color: transparent; }
+
+/* ---------- Bulk bar ---------- */
+.bulk-bar {
+  position: sticky; bottom: 14px; margin-top: 14px;
+  background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-size: 12.5px;
+  box-shadow: var(--shadow);
+}
+
+/* ---------- Kanban ---------- */
+.kanban-board { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; }
+.kanban-col { flex: 0 0 250px; display: flex; flex-direction: column; }
+.kanban-col-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 4px 10px; font-size: 12.5px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: .03em;
+}
+.kanban-count { background: var(--panel-2); border-radius: 20px; padding: 1px 8px; font-size: 11px; }
+.kanban-drop {
+  background: var(--panel-2); border: 1px dashed var(--border); border-radius: var(--radius);
+  padding: 8px; min-height: 120px; flex: 1; display: flex; flex-direction: column; gap: 8px;
+  transition: background .1s ease, border-color .1s ease;
+}
+.kanban-drop.drop-hover { background: rgba(62,182,160,.08); border-color: var(--accent); }
+.kanban-card {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px 12px; cursor: grab; box-shadow: var(--shadow);
+}
+.kanban-card.dragging { opacity: .4; }
+.kc-title { font-weight: 600; font-size: 13px; margin-bottom: 6px; }
+.kc-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.kc-value { font-family: var(--font-mono); font-size: 12px; color: var(--good); font-weight: 600; }
+.kc-meta-sub { font-size: 11px; color: var(--text-dim); }
+
+/* ---------- Follow-ups ---------- */
+.followup-list { display: flex; flex-direction: column; gap: 2px; max-height: 260px; overflow-y: auto; }
+.followup-item {
+  display: flex; justify-content: space-between; padding: 9px 6px; border-radius: 6px;
+  cursor: pointer; font-size: 13px;
+}
+.followup-item:hover { background: var(--panel-2); }
+.followup-date { color: var(--text-dim); font-size: 12px; }
+.fu-count {
+  display: inline-flex; align-items: center; gap: 3px; margin-left: 6px;
+  padding: 1px 7px; border-radius: 999px; background: var(--panel-2);
+  border: 1px solid var(--border); font-size: 11px; color: var(--text-muted); white-space: nowrap;
+}
+.fu-count-hint { font-size: 11.5px; color: var(--text-dim); margin-top: 4px; display: block; }
+
+.task-list { display: flex; flex-direction: column; gap: 4px; }
+.task-row { display: flex; align-items: center; gap: 12px; padding: 10px 6px; border-radius: 8px; }
+.task-row:hover { background: var(--panel-2); }
+.task-row.done .task-title { text-decoration: line-through; color: var(--text-dim); }
+.task-info { flex: 1; }
+.task-title { font-size: 13.5px; font-weight: 600; }
+.task-sub { font-size: 11.5px; color: var(--text-dim); margin-top: 1px; }
+
+/* ---------- Modals ---------- */
+.overlay {
+  position: fixed; inset: 0; background: rgba(6,8,13,.6); backdrop-filter: blur(2px);
+  display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px;
+}
+.overlay.open { display: flex; }
+.modal {
+  background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 14px;
+  padding: 24px; width: 100%; max-width: 620px; max-height: 88vh; overflow-y: auto;
+  box-shadow: var(--shadow); animation: pop .16s ease both;
+}
+.modal-sm { max-width: 400px; }
+@keyframes pop { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: scale(1); } }
+.modal h3 { margin: 0 0 16px; font-size: 17px; font-weight: 700; }
+.modal-msg { color: var(--text-muted); font-size: 13.5px; line-height: 1.5; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.confirm-pw-label { display: block; margin-top: 14px; font-size: 12.5px; color: var(--text-muted); font-weight: 600; }
+.confirm-pw-input {
+  display: block; width: 100%; margin-top: 6px; padding: 9px 12px;
+  border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2);
+  color: var(--text); font-size: 13.5px; font-family: var(--font-ui);
+}
+.confirm-pw-input:focus { outline: none; border-color: var(--accent); }
+.confirm-pw-error { display: none; color: var(--danger); font-size: 12px; margin: 6px 0 0; }
+.confirm-pw-error.show { display: block; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+.form-grid .span-2 { grid-column: span 2; }
+.form-grid label { display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.form-grid input, .form-grid select, .form-grid textarea {
+  padding: 8px 10px; border-radius: 7px; border: 1px solid var(--border);
+  background: var(--panel-2); color: var(--text); font-size: 13.5px; font-family: var(--font-ui); font-weight: 400;
+}
+.form-grid textarea { resize: vertical; }
+@media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } .form-grid .span-2 { grid-column: span 1; } }
+
+.fu-form-label { display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.fu-form-label textarea {
+  padding: 9px 11px; border-radius: 7px; border: 1px solid var(--border);
+  background: var(--panel-2); color: var(--text); font-size: 13.5px; font-family: var(--font-ui);
+  font-weight: 400; resize: vertical;
+}
+.fu-history { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+.fu-history h4 { margin: 0 0 8px; font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .04em; }
+.fu-history-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; }
+.fu-history-list li { display: flex; flex-direction: column; gap: 2px; font-size: 12.5px; }
+.fu-history-date { color: var(--text-dim); font-size: 11px; }
+.fu-history-text { color: var(--text-muted); }
+
+/* ---------- Toasts ---------- */
+#toast-host { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 200; }
+.toast {
+  background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 9px;
+  padding: 10px 14px; font-size: 13px; display: flex; align-items: center; gap: 9px;
+  box-shadow: var(--shadow); opacity: 0; transform: translateY(6px); transition: all .2s ease;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast-icon { font-size: 12px; }
+.toast-success .toast-icon { color: var(--good); }
+.toast-error .toast-icon { color: var(--danger); }
+.toast-warn .toast-icon { color: var(--warn); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 880px) {
+  .app-shell { grid-template-columns: 1fr; }
+  .sidebar {
+    position: fixed; bottom: 0; left: 0; right: 0; top: auto; height: auto; width: 100%;
+    flex-direction: row; overflow-x: auto; padding: 8px; border-right: none; border-top: 1px solid var(--border); z-index: 50;
+  }
+  .brand, .sidebar-footer { display: none; }
+  .nav-item { flex-direction: column; gap: 3px; font-size: 10px; padding: 6px 10px; }
+  main#main { padding: 18px 14px 100px; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .search-wrap { max-width: none; }
+}
+
+/* ---------- Follow-up Management module ---------- */
+.kpi-card.clickable { cursor: pointer; transition: transform .1s ease, border-color .12s ease; }
+.kpi-card.clickable:hover { border-color: var(--accent); transform: translateY(-2px); }
+.kpi-card.kpi-active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.chip.prio-Urgent { background: rgba(224,101,79,.22); color: var(--danger); border-color: transparent; font-weight: 700; }
+.chip.outc-Positive, .chip.outc-ContractSigned, .chip.outc-ProposalSent, .chip.outc-MeetingScheduled { background: rgba(95,203,147,.15); color: var(--good); border-color: transparent; }
+.chip.outc-Negative, .chip.outc-NotInterested, .chip.outc-LostOpportunity { background: rgba(224,101,79,.14); color: var(--danger); border-color: transparent; }
+.chip.outc-Neutral, .chip.outc-NeedMoreInformation, .chip.outc-FollowupRequired { background: rgba(242,166,90,.14); color: var(--warn); border-color: transparent; }
+.chip.stage-Won { background: rgba(95,203,147,.18); color: var(--good); border-color: transparent; }
+.chip.stage-Lost { background: rgba(224,101,79,.16); color: var(--danger); border-color: transparent; }
+
+.view-tabs { display: flex; gap: 4px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 4px; margin-bottom: 16px; width: fit-content; }
+.view-tab { padding: 7px 16px; border-radius: 7px; font-size: 12.5px; font-weight: 600; color: var(--text-muted); cursor: pointer; user-select: none; }
+.view-tab:hover { color: var(--text); }
+.view-tab.active { background: var(--accent); color: #0a0d13; }
+
+.fu-days { font-family: var(--font-mono); font-weight: 700; }
+.fu-days.overdue { color: var(--danger); }
+.fu-days.today { color: var(--warn); }
+.fu-days.soon { color: var(--accent); }
+.row-overdue td:first-child { box-shadow: inset 3px 0 0 var(--danger); }
+
+.export-bar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+.export-bar .fu-search { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); font-size: 13px; min-width: 220px; }
+
+.pagination { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 12px; font-size: 12.5px; color: var(--text-muted); }
+.pagination button { padding: 5px 11px; border-radius: 6px; border: 1px solid var(--border); background: var(--panel); color: var(--text); cursor: pointer; font-size: 12px; }
+.pagination button:disabled { opacity: .35; cursor: default; }
+
+.notif-list { display: flex; flex-direction: column; gap: 6px; max-height: 300px; overflow-y: auto; }
+.notif-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; background: var(--panel-2); font-size: 12.5px; cursor: pointer; }
+.notif-item:hover { background: var(--bg-elevated); }
+.notif-badge { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.notif-badge.bad { background: var(--danger); }
+.notif-badge.warn { background: var(--warn); }
+.notif-badge.info { background: var(--accent); }
+.notif-text { flex: 1; }
+.notif-time { color: var(--text-dim); font-size: 11px; white-space: nowrap; }
+
+.tl-list { display: flex; flex-direction: column; gap: 0; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+.tl-item { display: flex; gap: 12px; padding: 0 0 16px 0; position: relative; }
+.tl-item::before { content: ''; position: absolute; left: 5px; top: 16px; bottom: 0; width: 1px; background: var(--border); }
+.tl-item:last-child::before { display: none; }
+.tl-dot { width: 11px; height: 11px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 3px; box-shadow: 0 0 0 3px var(--panel); z-index: 1; }
+.tl-body { flex: 1; }
+.tl-head { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; font-weight: 600; }
+.tl-meta { font-size: 11px; color: var(--text-dim); margin-top: 1px; }
+.tl-notes { font-size: 12.5px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
+
+.calendar-wrap { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+.calendar-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.calendar-head h3 { margin: 0; font-size: 15px; }
+.calendar-nav { display: flex; gap: 6px; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.calendar-dow { text-align: center; font-size: 11px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; padding-bottom: 4px; }
+.calendar-cell { min-height: 84px; border: 1px solid var(--border); border-radius: 8px; padding: 6px; background: var(--panel-2); font-size: 11px; cursor: pointer; }
+.calendar-cell.empty { background: transparent; border-color: transparent; cursor: default; }
+.calendar-cell.today { border-color: var(--accent); }
+.calendar-cell:hover:not(.empty) { border-color: var(--accent); }
+.calendar-daynum { font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
+.calendar-cell.today .calendar-daynum { color: var(--accent); }
+.calendar-event { background: rgba(62,182,160,.16); color: var(--accent); border-radius: 4px; padding: 1px 5px; margin-bottom: 2px; font-size: 10px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.calendar-event.overdue-ev { background: rgba(224,101,79,.16); color: var(--danger); }
+.calendar-more { font-size: 10px; color: var(--text-dim); }
+
+.stat-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 14px; }
+.stat-box { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; text-align: center; }
+.stat-box .stat-val { font-family: var(--font-mono); font-size: 20px; font-weight: 700; }
+.stat-box .stat-lbl { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+.dup-warning { background: rgba(242,166,90,.1); border: 1px solid var(--warn); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: var(--warn); margin-bottom: 12px; }
+
+@media print {
+  .sidebar, .topbar, .view-tabs, .export-bar, .header-actions, .row-actions, .filter-bar, .bulk-bar, .pagination, th.print-hide, td.print-hide { display: none !important; }
+  main#main { padding: 0; max-width: 100%; }
+  body { background: #fff; color: #000; }
+  .data-table th, .data-table td { color: #000; border-color: #ccc; }
+}
+
+@media (max-width: 1100px) {
+  .calendar-cell { min-height: 60px; }
+}
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">H</div>
+      <div>
+        <div class="brand-name">mirapp-eg</div>
+        <div class="brand-sub">Sales Control</div>
+      </div>
+    </div>
+
+    <div class="nav-item active" data-view="dashboard"><span class="nav-icon">◱</span> Dashboard</div>
+    <div class="nav-item" data-view="companies"><span class="nav-icon">🏢</span> Companies</div>
+    <div class="nav-item" data-view="kanban"><span class="nav-icon">📋</span> Pipeline</div>
+    <div class="nav-item" data-view="contacts"><span class="nav-icon">👤</span> Contacts</div>
+    <div class="nav-item" data-view="tasks"><span class="nav-icon">✓</span> Follow-ups</div>
+    <div class="nav-item" data-view="followupmgmt"><span class="nav-icon">📌</span> Follow-up Mgmt</div>
+    <div class="nav-item" data-view="history"><span class="nav-icon">🕓</span> History</div>
+    <div class="nav-item" data-view="settings"><span class="nav-icon">⚙</span> Settings</div>
+
+    <div class="sidebar-footer">
+      Shared data, synced live via Firebase — every change appears for everyone instantly. Use Settings → Backup to keep a safe copy.
+    </div>
+  </aside>
+
+  <div class="main-col">
+    <header class="topbar">
+      <div class="search-wrap">
+        <input type="text" id="global-search" placeholder="Search companies by name, email, phone...">
+      </div>
+      <div class="topbar-actions">
+        <div class="save-status" id="save-status" title="Everything auto-saves — no Save button needed">
+          <span class="save-dot saved" id="save-dot"></span>
+          <span id="save-text">All Changes Saved</span>
+        </div>
+        <div class="last-updated">Last Updated: <b id="last-updated-value">—</b></div>
+        <button class="icon-btn-round" id="theme-toggle" title="Toggle theme">☀️</button>
+        <button class="btn btn-ghost" id="btn-import">Import Excel</button>
+        <button class="btn btn-ghost" id="btn-export">Export Excel</button>
+        <button class="btn btn-primary" id="btn-add-company">+ Add Company</button>
+        <input type="file" id="file-import" accept=".xlsx,.xls,.csv" hidden>
+      </div>
+    </header>
+
+    <main id="main"></main>
+  </div>
+</div>
+
+<div id="modal-overlay" class="overlay"></div>
+<div id="confirm-overlay" class="overlay"></div>
+<div id="toast-host"></div>
+
+<script>
+
+// ============================================================
+// FIREBASE CONNECTION — paste your project's config below.
+// Get it from: Firebase Console → Project settings → General →
+// "Your apps" → SDK setup and configuration → Config.
+// Firestore must be enabled (Build → Firestore Database → Create).
+// For a quick shared/multi-user test, open Firestore Rules and use:
+//   rules_version = '2';
+//   service cloud.firestore {
+//     match /databases/{database}/documents {
+//       match /{document=**} { allow read, write: if true; }
+//     }
+//   }
+// (That allows anyone with the URL to read/write — fine for an
+// internal team tool, but add Firebase Auth + tighter rules before
+// exposing this outside your team.)
+// ============================================================
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+// True only once someone has actually pasted their real project config in.
+const FIREBASE_CONFIGURED = firebaseConfig.apiKey && firebaseConfig.apiKey !== 'YOUR_API_KEY' && firebaseConfig.projectId !== 'YOUR_PROJECT_ID';
+
+let fsdb = null;
+let firebaseInitError = null;
+if (FIREBASE_CONFIGURED) {
+  try {
+    firebase.initializeApp(firebaseConfig);
+    fsdb = firebase.firestore();
+  } catch (err) {
+    firebaseInitError = err;
+    console.error('Firebase failed to initialize:', err);
+  }
+}
+
+/** Shows a full-page setup/error screen instead of silently rendering an empty, broken app. */
+function showFirebaseBlockingScreen(title, lines) {
+  const render = () => {
+    document.body.innerHTML = `
+      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#0F131C;color:#E7EAF2;font-family:Inter,-apple-system,sans-serif;">
+        <div style="max-width:560px;background:#171E2C;border:1px solid #262f42;border-radius:14px;padding:28px 30px;">
+          <h2 style="margin:0 0 14px;font-size:18px;">${title}</h2>
+          ${lines.map(l => `<p style="color:#8b93a7;font-size:13.5px;line-height:1.7;margin:0 0 10px;">${l}</p>`).join('')}
+        </div>
+      </div>`;
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render);
+  else render();
+}
+
+if (!FIREBASE_CONFIGURED) {
+  showFirebaseBlockingScreen('⚠️ Firebase not configured yet / لسه متوصلش بـ Firebase', [
+    'This file still has the placeholder <code>firebaseConfig</code> values (<code>YOUR_API_KEY</code>, etc.) — the app can\'t connect to any database until you paste your real project\'s config.',
+    'لسه القيم في <code>firebaseConfig</code> أول الملف زي ما هي (<code>YOUR_API_KEY</code>...). لازم تستبدلها ببيانات مشروعك من Firebase Console → Project settings → Your apps، وتتأكد إن Firestore Database متفعّل.',
+    'After editing, save the file and reopen it. / بعد ما تعدّل، احفظ الملف وافتحه تاني.'
+  ]);
+} else if (firebaseInitError) {
+  showFirebaseBlockingScreen('⚠️ Firebase failed to initialize / فشل الاتصال بـ Firebase', [
+    `Error: ${(firebaseInitError && firebaseInitError.message) || firebaseInitError}`,
+    'Double-check every value in <code>firebaseConfig</code> was copied correctly (no extra spaces/quotes), and that Firestore is enabled for this project.',
+    'تأكد إن كل قيمة في <code>firebaseConfig</code> اتنسخت صح من غير مسافات أو أخطاء، وإن Firestore Database متفعّل فعليًا في المشروع.'
+  ]);
+}
+
+/* ===== storage.js ===== */
+/* ============================================================
+   storage.js — Persistence layer, now backed by Firebase Firestore
+   instead of IndexedDB. Firestore is the single shared database:
+   every browser that opens this file reads and writes the same
+   collections, and onSnapshot() pushes any change (from anyone)
+   to everyone else live, with no refresh needed. The public shape
+   (DB.companies.all(), DB.companies.put(), DB.companies.onChange(),
+   etc.) is unchanged, so nothing else in app.js had to be touched.
+   ============================================================ */
+
+// Password required to confirm any permanent-delete action (companies, contacts,
+// tasks, team members, full data wipe). Change this string to change the password.
+const DELETE_PASSWORD = '2026';
+
+function makeRepo(storeName, idField = 'id') {
+  const col = () => fsdb.collection(storeName);
+  return {
+    async all() {
+      const snap = await col().get();
+      return snap.docs.map(d => d.data());
+    },
+    async get(id) {
+      const doc = await col().doc(String(id)).get();
+      return doc.exists ? doc.data() : undefined;
+    },
+    async put(record) {
+      SaveStatus.saving();
+      try {
+        await col().doc(String(record[idField])).set(record);
+        SaveStatus.saved();
+        return record;
+      } catch (err) { SaveStatus.error(); throw err; }
+    },
+    async bulkPut(records) {
+      SaveStatus.saving();
+      try {
+        const batch = fsdb.batch();
+        records.forEach(r => batch.set(col().doc(String(r[idField])), r));
+        await batch.commit();
+        SaveStatus.saved();
+        return records;
+      } catch (err) { SaveStatus.error(); throw err; }
+    },
+    async delete(id) {
+      SaveStatus.saving();
+      try {
+        await col().doc(String(id)).delete();
+        SaveStatus.saved();
+        return id;
+      } catch (err) { SaveStatus.error(); throw err; }
+    },
+    async clear() {
+      SaveStatus.saving();
+      try {
+        const snap = await col().get();
+        const batch = fsdb.batch();
+        snap.docs.forEach(d => batch.delete(d.ref));
+        await batch.commit();
+        SaveStatus.saved();
+      } catch (err) { SaveStatus.error(); throw err; }
+    },
+    // Live subscription — fires immediately with current data, then again
+    // every time ANY user adds/edits/deletes a record in this collection.
+    onChange(cb) {
+      return col().onSnapshot(
+        snap => cb(snap.docs.map(d => d.data())),
+        err => console.error(`Realtime sync error on "${storeName}":`, err)
+      );
+    }
+  };
+}
+
+const DB = {
+  companies: makeRepo('companies'),
+  contacts: makeRepo('contacts'),
+  tasks: makeRepo('tasks'),
+  activities: makeRepo('activities'),
+  meta: makeRepo('meta', 'key'),
+  followups: makeRepo('followups'),
+
+  async getSetting(key, fallback = null) {
+    const rec = await this.meta.get(key);
+    return rec ? rec.value : fallback;
+  },
+  async setSetting(key, value) {
+    return this.meta.put({ key, value });
+  },
+
+  /** Full JSON snapshot of every store — used for backup/restore. */
+  async exportAll() {
+    const [companies, contacts, tasks, activities, followups] = await Promise.all([
+      this.companies.all(), this.contacts.all(), this.tasks.all(), this.activities.all(), this.followups.all()
+    ]);
+    return { version: 3, exportedAt: new Date().toISOString(), companies, contacts, tasks, activities, followups };
+  },
+
+  /** Restores a JSON snapshot produced by exportAll(). Replaces existing data for everyone. */
+  async importAll(snapshot) {
+    await Promise.all([
+      this.companies.clear(), this.contacts.clear(), this.tasks.clear(), this.activities.clear(), this.followups.clear()
+    ]);
+    await Promise.all([
+      snapshot.companies?.length ? this.companies.bulkPut(snapshot.companies) : null,
+      snapshot.contacts?.length ? this.contacts.bulkPut(snapshot.contacts) : null,
+      snapshot.tasks?.length ? this.tasks.bulkPut(snapshot.tasks) : null,
+      snapshot.activities?.length ? this.activities.bulkPut(snapshot.activities) : null,
+      snapshot.followups?.length ? this.followups.bulkPut(snapshot.followups) : null,
+    ]);
+  }
+};
+
+function uid(prefix) {
+  return `${prefix}${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function nowISO() { return new Date().toISOString(); }
+
+
+/* ===== schema.js ===== */
+/* ============================================================
+   schema.js — Single source of truth for field names & options.
+   These mirror your CRM.xlsx dropdown lists exactly, so import/
+   export round-trips cleanly. Extend the arrays below to add
+   new dropdown choices anywhere in the app.
+   ============================================================ */
+
+const OPTIONS = {
+  priority: ['High', 'Medium', 'Low'],
+  segment: ['Hotel', 'Valet management company', 'Parking companies', 'Real state developers', 'Malls', 'Hospitals', 'other'],
+  leadSource: ['LinkedIn', 'Instagram', 'Facebook', 'cold call', 'website', 'Email'],
+  leadStatus: ['Prospect', 'Lead', 'Qualified Lead', 'Client'],
+  responseStatus: ['Not contacted', 'Attempted contact', 'No response', 'Responded', 'Need follow up', 'Not interested'],
+  // Pipeline stages — matches your sheet's list, extended with a closing pair
+  // (Deal closed / Lost) so the kanban board can represent won vs lost deals.
+  pipeline: ['Research', 'Outreach sent', 'Discovery call', 'Demo scheduled', 'Proposal sent', 'Negotiation', 'Contract sent', 'Deal closed', 'Lost'],
+  bestTimeToContact: ['Morning', 'Afternoon', 'Evening'],
+  assignedTo: ['Abdelrhman salah', 'Mohamed ayman'], // editable in Settings
+  taskPriority: ['High', 'Medium', 'Low'],
+  taskStatus: ['Pending', 'In Progress', 'Completed'],
+
+  // ----- Follow-up Management module -----
+  fuPurpose: [
+    'First Contact', 'Reach Decision Maker', 'Qualification', 'Schedule Meeting', 'Confirm Meeting',
+    'Send Company Profile', 'Send Proposal', 'Proposal Follow-up', 'Contract Discussion',
+    'Pricing Discussion', 'Negotiation', 'Waiting for Client Decision', 'Technical Discussion',
+    'Site Visit', 'Demo Presentation', 'Collect Required Documents', 'Contract Signing',
+    'Project Kickoff', 'Payment Follow-up', 'Re-engagement', 'Customer Support', 'General Follow-up', 'Other'
+  ],
+  fuStage: [
+    'New Lead', 'Contacted', 'Qualified', 'Meeting Scheduled', 'Meeting Completed', 'Proposal Sent',
+    'Negotiation', 'Pending Decision', 'Won', 'Lost', 'On Hold', 'Closed'
+  ],
+  fuMethod: [
+    'Phone Call', 'WhatsApp', 'Email', 'SMS', 'LinkedIn', 'Microsoft Teams', 'Zoom', 'Google Meet',
+    'In-person Meeting', 'Site Visit', 'Other'
+  ],
+  fuPriority: ['Low', 'Medium', 'High', 'Urgent'],
+  fuStatus: [
+    'Scheduled', 'Completed', 'Rescheduled', 'Waiting for Client', 'Waiting for Internal Team',
+    'Cancelled', 'No Response', 'Closed'
+  ],
+  fuOutcome: [
+    'Positive', 'Neutral', 'Negative', 'Meeting Scheduled', 'Proposal Requested', 'Proposal Sent',
+    'Need More Information', 'Follow-up Required', 'Not Interested', 'Contract Signed', 'Lost Opportunity'
+  ],
+};
+
+// Stages that count as a "closed" opportunity — used for overdue detection so
+// nothing still open silently drops off the radar.
+const FU_CLOSED_STAGES = ['Won', 'Lost', 'Closed'];
+
+// Exact Excel column headers, in order, for each sheet — used by excel.js
+// so exports match the original workbook structure.
+const COMPANY_XLSX_HEADERS = [
+  'Company ID', 'Priority', 'Company name', 'website', 'company email',
+  'company phone number', 'segment', 'Lead communication source', 'Lead status',
+  'Response status', 'Sales pipeline', 'last communication date', 'Next follow up date',
+  'Follow up count', 'Assigned to', 'Notes', 'Deal value', 'Archived'
+];
+
+const COMPANY_FIELD_MAP = {
+  'Company ID': 'id', 'Priority': 'priority', 'Company name': 'name', 'website': 'website',
+  'company email': 'email', 'company phone number': 'phone', 'segment': 'segment',
+  'Lead communication source': 'leadSource', 'Lead status': 'leadStatus',
+  'Response status': 'responseStatus', 'Sales pipeline': 'pipeline',
+  'last communication date': 'lastContactDate', 'Next follow up date': 'nextFollowUp',
+  'Follow up count': 'followUpCount', 'Assigned to': 'assignedTo', 'Notes': 'notes',
+  'Deal value': 'dealValue', 'Archived': 'archived'
+};
+
+const CONTACT_XLSX_HEADERS = [
+  'Contact ID', 'Company ID', 'Priority', 'Company name', 'website', 'Contact name',
+  'Contact email', 'contact phone number', 'Contact Job title', 'LinkedIn profile',
+  'Contact communication source', 'Lead status', 'Response status', 'Sales pipeline',
+  'Best time to contact', 'last communication date', 'Next follow up date',
+  'Follow up count', 'Assigned to', 'Notes'
+];
+
+const CONTACT_FIELD_MAP = {
+  'Contact ID': 'id', 'Company ID': 'companyId', 'Priority': 'priority', 'Company name': 'companyName',
+  'website': 'website', 'Contact name': 'name', 'Contact email': 'email',
+  'contact phone number': 'phone', 'Contact Job title': 'jobTitle', 'LinkedIn profile': 'linkedin',
+  'Contact communication source': 'leadSource', 'Lead status': 'leadStatus',
+  'Response status': 'responseStatus', 'Sales pipeline': 'pipeline',
+  'Best time to contact': 'bestTime', 'last communication date': 'lastContactDate',
+  'Next follow up date': 'nextFollowUp', 'Follow up count': 'followUpCount',
+  'Assigned to': 'assignedTo', 'Notes': 'notes'
+};
+
+function blankCompany() {
+  return {
+    id: uid('L'), priority: 'Medium', name: '', website: '', email: '', phone: '',
+    segment: '', leadSource: '', leadStatus: 'Prospect', responseStatus: 'Not contacted',
+    pipeline: 'Research', lastContactDate: '', nextFollowUp: '', followUpCount: 0, followUpLog: [],
+    assignedTo: '', notes: '', dealValue: 0, archived: false,
+    createdAt: nowISO(), updatedAt: nowISO(), version: 1
+  };
+}
+
+function blankContact(companyId = '', companyName = '') {
+  return {
+    id: uid('C'), companyId, companyName, priority: 'Medium', website: '', name: '',
+    email: '', phone: '', jobTitle: '', linkedin: '', leadSource: '', leadStatus: 'Prospect',
+    responseStatus: 'Not contacted', pipeline: 'Research', bestTime: '', lastContactDate: '',
+    nextFollowUp: '', followUpCount: 0, followUpLog: [], assignedTo: '', notes: '',
+    createdAt: nowISO(), updatedAt: nowISO(), version: 1
+  };
+}
+
+function blankTask() {
+  return {
+    id: uid('T'), title: '', companyId: '', companyName: '', dueDate: '',
+    priority: 'Medium', status: 'Pending', assignedTo: '', notes: '',
+    createdAt: nowISO(), updatedAt: nowISO(), version: 1
+  };
+}
+
+function blankFollowup() {
+  const today = nowISO().slice(0, 10);
+  return {
+    id: uid('F'),
+    companyId: '', companyName: '', clientName: '', contactId: '', contactName: '', jobTitle: '',
+    phone: '', email: '',
+    assignedTo: '', stage: 'New Lead', purpose: 'First Contact', method: 'Phone Call',
+    priority: 'Medium', status: 'Scheduled', outcome: '',
+    subject: '', notes: '', nextAction: '',
+    lastContactDate: today, nextFollowUpDate: '', reminderDate: '', reminderTime: '',
+    dealValue: 0, probability: 10, expectedClosingDate: '',
+    attachments: [], tags: '', internalNotes: '',
+    timeline: [],
+    createdAt: nowISO(), updatedAt: nowISO(), version: 1
+  };
+}
+
+
+/* ===== excel.js ===== */
+/* ============================================================
+   excel.js — Excel <-> CRM sync
+   Uses SheetJS (loaded via CDN in index.html) to read/write
+   .xlsx files with the exact same headers as the original
+   CRM.xlsx, so round-tripping through Excel preserves meaning.
+   ============================================================ */
+
+const Excel = {
+  /**
+   * Reads a File (.xlsx/.csv), returns { companies, contacts, stats }.
+   * Rows that are entirely empty (aside from an auto-numbered ID) are skipped.
+   */
+  async readFile(file) {
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type: 'array', cellDates: true });
+
+    const companySheetName = wb.SheetNames.find(n => /compan(y|ies)/i.test(n) && !/contact|decision/i.test(n)) || wb.SheetNames[0];
+    const contactSheetName = wb.SheetNames.find(n => /contact|decision/i.test(n));
+
+    const companies = companySheetName ? this._sheetToRecords(wb.Sheets[companySheetName], COMPANY_FIELD_MAP, blankCompany) : [];
+    const contacts = contactSheetName ? this._sheetToRecords(wb.Sheets[contactSheetName], CONTACT_FIELD_MAP, () => blankContact()) : [];
+
+    return { companies, contacts, stats: { companies: companies.length, contacts: contacts.length } };
+  },
+
+  _sheetToRecords(sheet, fieldMap, blankFactory) {
+    const rows = XLSX.utils.sheet_to_json(sheet, { defval: '', raw: false });
+    const norm = (s) => String(s).trim().toLowerCase();
+    // Build a lookup from normalized header -> field, so trailing spaces or
+    // case differences in the source workbook (like "Contact name ") still match.
+    const normFieldMap = {};
+    for (const [header, field] of Object.entries(fieldMap)) normFieldMap[norm(header)] = field;
+
+    const out = [];
+    for (const row of rows) {
+      const rec = blankFactory();
+      let hasData = false;
+      const normRow = {};
+      for (const key of Object.keys(row)) normRow[norm(key)] = row[key];
+
+      for (const [normHeader, field] of Object.entries(normFieldMap)) {
+        if (!(normHeader in normRow)) continue;
+        let val = normRow[normHeader];
+        if (field === 'id') {
+          if (val !== '' && val != null) rec.id = String(val).trim();
+          continue;
+        }
+        if (val === '' || val == null) continue;
+        if (field === 'followUpCount' || field === 'dealValue') val = Number(val) || 0;
+        if (field === 'archived') val = /^(true|1|yes)$/i.test(String(val));
+        if ((field === 'lastContactDate' || field === 'nextFollowUp') && val instanceof Date) {
+          val = val.toISOString().slice(0, 10);
+        }
+        rec[field] = val;
+        hasData = true;
+      }
+      if (hasData) {
+        rec.updatedAt = nowISO();
+        if (!rec.createdAt) rec.createdAt = nowISO();
+        out.push(rec);
+      }
+    }
+    return out;
+  },
+
+  /** Merges imported records into the DB: updates existing IDs, inserts new ones. Never deletes. */
+  async mergeImport(imported) {
+    let added = 0, updated = 0;
+    for (const c of imported.companies) {
+      const existing = await DB.companies.get(c.id);
+      await DB.companies.put({ ...(existing || {}), ...c, id: c.id });
+      existing ? updated++ : added++;
+    }
+    let cAdded = 0, cUpdated = 0;
+    for (const c of imported.contacts) {
+      const existing = await DB.contacts.get(c.id);
+      await DB.contacts.put({ ...(existing || {}), ...c, id: c.id });
+      existing ? cUpdated++ : cAdded++;
+    }
+    return { companies: { added, updated }, contacts: { added: cAdded, updated: cUpdated } };
+  },
+
+  /** Exports current DB state to a downloadable .xlsx matching the original headers. */
+  async exportWorkbook() {
+    const [companies, contacts] = await Promise.all([DB.companies.all(), DB.contacts.all()]);
+    const wb = XLSX.utils.book_new();
+
+    const companyRows = companies.map(c => {
+      const row = {};
+      for (const h of COMPANY_XLSX_HEADERS) row[h] = c[COMPANY_FIELD_MAP[h]] ?? '';
+      return row;
+    });
+    const contactRows = contacts.map(c => {
+      const row = {};
+      for (const h of CONTACT_XLSX_HEADERS) row[h] = c[CONTACT_FIELD_MAP[h]] ?? '';
+      return row;
+    });
+
+    const wsCompanies = XLSX.utils.json_to_sheet(companyRows, { header: COMPANY_XLSX_HEADERS });
+    const wsContacts = XLSX.utils.json_to_sheet(contactRows, { header: CONTACT_XLSX_HEADERS });
+    XLSX.utils.book_append_sheet(wb, wsCompanies, 'Companies (master sheet)');
+    XLSX.utils.book_append_sheet(wb, wsContacts, 'Companies decision makers conta');
+
+    const fname = `CRM_export_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    XLSX.writeFile(wb, fname);
+    return fname;
+  },
+
+  /** Exports companies as CSV. */
+  async exportCSV() {
+    const companies = await DB.companies.all();
+    const rows = companies.map(c => {
+      const row = {};
+      for (const h of COMPANY_XLSX_HEADERS) row[h] = c[COMPANY_FIELD_MAP[h]] ?? '';
+      return row;
+    });
+    const ws = XLSX.utils.json_to_sheet(rows, { header: COMPANY_XLSX_HEADERS });
+    const csv = XLSX.utils.sheet_to_csv(ws);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `CRM_companies_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+};
+
+
+/* ===== charts.js ===== */
+/* ============================================================
+   charts.js — Dashboard chart rendering (Chart.js)
+   ============================================================ */
+
+const Charts = { _instances: {} };
+
+Charts._palette = () => {
+  const styles = getComputedStyle(document.documentElement);
+  return {
+    accent: styles.getPropertyValue('--accent').trim() || '#3EB6A0',
+    accent2: styles.getPropertyValue('--accent-2').trim() || '#F2A65A',
+    danger: styles.getPropertyValue('--danger').trim() || '#E0654F',
+    text: styles.getPropertyValue('--text-muted').trim() || '#8b93a7',
+    grid: styles.getPropertyValue('--border').trim() || '#2a3142',
+    series: ['#3EB6A0', '#4C8DFF', '#F2A65A', '#B586F0', '#E0654F', '#5FCB93', '#F2D14E']
+  };
+}
+
+Charts._destroy = (key) => {
+  if (Charts._instances[key]) { Charts._instances[key].destroy(); delete Charts._instances[key]; }
+}
+
+Charts.renderFunnel = (canvasId, pipelineCounts) => {
+  Charts._destroy(canvasId);
+  const pal = Charts._palette();
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return;
+  const labels = Object.keys(pipelineCounts);
+  const data = Object.values(pipelineCounts);
+  Charts._instances[canvasId] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: labels.map((l, i) => l === 'Lost' ? pal.danger : pal.series[i % pal.series.length]),
+        borderRadius: 6,
+        barThickness: 22
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: pal.grid }, ticks: { color: pal.text, precision: 0 } },
+        y: { grid: { display: false }, ticks: { color: pal.text, font: { size: 11 } } }
+      }
+    }
+  });
+};
+
+Charts.renderLeadSources = (canvasId, sourceCounts) => {
+  Charts._destroy(canvasId);
+  const pal = Charts._palette();
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return;
+  const labels = Object.keys(sourceCounts);
+  const data = Object.values(sourceCounts);
+  Charts._instances[canvasId] = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: pal.series, borderWidth: 0 }] },
+    options: {
+      cutout: '68%',
+      plugins: { legend: { position: 'bottom', labels: { color: pal.text, boxWidth: 10, padding: 12, font: { size: 11 } } } }
+    }
+  });
+};
+
+Charts.renderMonthlyTrend = (canvasId, monthLabels, createdData, closedData) => {
+  Charts._destroy(canvasId);
+  const pal = Charts._palette();
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return;
+  Charts._instances[canvasId] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: monthLabels,
+      datasets: [
+        { label: 'New companies', data: createdData, borderColor: pal.accent, backgroundColor: pal.accent + '33', tension: 0.35, fill: true, pointRadius: 3 },
+        { label: 'Deals closed', data: closedData, borderColor: pal.accent2, backgroundColor: pal.accent2 + '22', tension: 0.35, fill: true, pointRadius: 3 }
+      ]
+    },
+    options: {
+      plugins: { legend: { position: 'bottom', labels: { color: pal.text, boxWidth: 10, font: { size: 11 } } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: pal.text, font: { size: 11 } } },
+        y: { grid: { color: pal.grid }, ticks: { color: pal.text, precision: 0 } }
+      }
+    }
+  });
+};
+
+Charts.renderLeadStatus = (canvasId, statusCounts) => {
+  Charts._destroy(canvasId);
+  const pal = Charts._palette();
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return;
+  Charts._instances[canvasId] = new Chart(ctx, {
+    type: 'polarArea',
+    data: { labels: Object.keys(statusCounts), datasets: [{ data: Object.values(statusCounts), backgroundColor: pal.series.map(c => c + 'cc') }] },
+    options: {
+      plugins: { legend: { position: 'bottom', labels: { color: pal.text, boxWidth: 10, font: { size: 11 } } } },
+      scales: { r: { grid: { color: pal.grid }, ticks: { display: false } } }
+    }
+  });
+};
+
+
+/* ===== ui.js ===== */
+/* ============================================================
+   ui.js — Small reusable UI helpers (toasts, modal, confirm)
+   ============================================================ */
+
+const UI = {
+  toast(message, type = 'info') {
+    const host = document.getElementById('toast-host');
+    const el = document.createElement('div');
+    el.className = `toast toast-${type}`;
+    const icons = { success: '✓', error: '✕', info: 'ℹ', warn: '!' };
+    el.innerHTML = `<span class="toast-icon">${icons[type] || icons.info}</span><span>${message}</span>`;
+    host.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('show'));
+    setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 250); }, 3200);
+  },
+
+  confirm(message, { title = 'Are you sure?', danger = true, confirmLabel = 'Delete', requirePassword = false } = {}) {
+    return new Promise((resolve) => {
+      const overlay = document.getElementById('confirm-overlay');
+      overlay.innerHTML = `
+        <div class="modal modal-sm">
+          <h3>${title}</h3>
+          <p class="modal-msg">${message}</p>
+          ${requirePassword ? `
+          <label class="confirm-pw-label">Password required to delete
+            <input type="password" id="confirm-password" class="confirm-pw-input" placeholder="Enter password" autocomplete="off">
+          </label>
+          <p class="confirm-pw-error" id="confirm-pw-error">Incorrect password</p>` : ''}
+          <div class="modal-actions">
+            <button class="btn btn-ghost" id="confirm-cancel">Cancel</button>
+            <button class="btn ${danger ? 'btn-danger' : 'btn-primary'}" id="confirm-ok">${confirmLabel}</button>
+          </div>
+        </div>`;
+      overlay.classList.add('open');
+      const close = (val) => { overlay.classList.remove('open'); overlay.innerHTML = ''; resolve(val); };
+      const pwInput = requirePassword ? overlay.querySelector('#confirm-password') : null;
+      const pwError = requirePassword ? overlay.querySelector('#confirm-pw-error') : null;
+      const attemptConfirm = () => {
+        if (requirePassword && (pwInput.value || '') !== DELETE_PASSWORD) {
+          pwError.classList.add('show');
+          pwInput.value = '';
+          pwInput.focus();
+          return;
+        }
+        close(true);
+      };
+      overlay.querySelector('#confirm-cancel').onclick = () => close(false);
+      overlay.querySelector('#confirm-ok').onclick = attemptConfirm;
+      if (pwInput) {
+        pwInput.focus();
+        pwInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') attemptConfirm(); });
+      }
+      overlay.onclick = (e) => { if (e.target === overlay) close(false); };
+    });
+  },
+
+  openModal(html) {
+    const overlay = document.getElementById('modal-overlay');
+    overlay.innerHTML = html;
+    overlay.classList.add('open');
+    overlay.onclick = (e) => { if (e.target === overlay) UI.closeModal(); };
+    document.addEventListener('keydown', UI._escHandler);
+  },
+  closeModal() {
+    const overlay = document.getElementById('modal-overlay');
+    overlay.classList.remove('open');
+    overlay.innerHTML = '';
+    document.removeEventListener('keydown', UI._escHandler);
+  },
+  _escHandler(e) { if (e.key === 'Escape') UI.closeModal(); },
+
+  escapeHtml(str) {
+    if (str == null) return '';
+    return String(str).replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+  },
+
+  optionsHtml(list, selected) {
+    return `<option value="">—</option>` + list.map(o => `<option value="${o}" ${o === selected ? 'selected' : ''}>${o}</option>`).join('');
+  },
+
+  fmtDate(d) {
+    if (!d) return '—';
+    const date = new Date(d);
+    if (isNaN(date)) return d;
+    return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  },
+
+  fmtMoney(n) {
+    n = Number(n) || 0;
+    return '$' + n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+  },
+
+  todayISO() { return new Date().toISOString().slice(0, 10); },
+
+  daysFromNow(n) {
+    const d = new Date(); d.setDate(d.getDate() + n);
+    return d.toISOString().slice(0, 10);
+  }
+};
+
+
+/* ===== history.js ===== */
+/* ============================================================
+   history.js — Save-status indicator + change-tracking helpers.
+   SaveStatus reflects the real state of the last DB write (every
+   DB.*.put / delete / bulkPut / clear call in storage.js reports
+   into it), so the top-bar dot is never just decorative.
+   diffRecords() produces the old/new field pairs that power the
+   Activity Log and Undo/Restore.
+   ============================================================ */
+
+const SaveStatus = {
+  _errorTimer: null,
+  saving() {
+    const dot = document.getElementById('save-dot');
+    const text = document.getElementById('save-text');
+    if (!dot || !text) return;
+    clearTimeout(this._errorTimer);
+    dot.className = 'save-dot saving';
+    text.textContent = 'Saving...';
+  },
+  saved() {
+    const dot = document.getElementById('save-dot');
+    const text = document.getElementById('save-text');
+    if (!dot || !text) return;
+    dot.className = 'save-dot saved';
+    text.textContent = 'All Changes Saved';
+  },
+  error() {
+    const dot = document.getElementById('save-dot');
+    const text = document.getElementById('save-text');
+    if (!dot || !text) return;
+    dot.className = 'save-dot error';
+    text.textContent = 'Error Saving Data';
+    // Auto-recover the indicator after a bit so a transient error
+    // doesn't permanently stick the top bar in a red state.
+    clearTimeout(this._errorTimer);
+    this._errorTimer = setTimeout(() => this.saved(), 5000);
+  }
+};
+
+const COMPANY_FIELD_LABELS = {
+  name: 'Company Name', website: 'Website', email: 'Email', phone: 'Phone', segment: 'Segment',
+  priority: 'Priority', leadSource: 'Lead Source', leadStatus: 'Lead Status', responseStatus: 'Response Status',
+  pipeline: 'Sales Pipeline', assignedTo: 'Assigned To', dealValue: 'Deal Value', lastContactDate: 'Last Contact Date',
+  nextFollowUp: 'Next Follow-up', notes: 'Notes', archived: 'Archived', followUpCount: 'Follow-up Count'
+};
+const CONTACT_FIELD_LABELS = {
+  name: 'Full Name', companyId: 'Company', jobTitle: 'Job Title', linkedin: 'LinkedIn', email: 'Email', phone: 'Phone',
+  bestTime: 'Best Time to Contact', leadStatus: 'Lead Status', nextFollowUp: 'Next Follow-up',
+  assignedTo: 'Assigned To', notes: 'Notes', followUpCount: 'Follow-up Count'
+};
+const TASK_FIELD_LABELS = {
+  title: 'Title', companyId: 'Related Company', dueDate: 'Due Date', priority: 'Priority',
+  status: 'Status', assignedTo: 'Assigned To', notes: 'Notes'
+};
+const FOLLOWUP_FIELD_LABELS = {
+  companyId: 'Company', clientName: 'Client Name', contactId: 'Contact Person', assignedTo: 'Assigned Salesperson',
+  stage: 'Opportunity Stage', purpose: 'Follow-up Purpose', method: 'Follow-up Method',
+  priority: 'Priority', status: 'Status', outcome: 'Outcome', subject: 'Subject', notes: 'Detailed Notes',
+  nextAction: 'Next Action', lastContactDate: 'Last Contact Date', nextFollowUpDate: 'Next Follow-up Date',
+  reminderDate: 'Reminder Date', reminderTime: 'Reminder Time', dealValue: 'Estimated Deal Value',
+  probability: 'Probability %', expectedClosingDate: 'Expected Closing Date', tags: 'Tags'
+};
+
+/** Compares two plain objects field-by-field and returns [{field,label,old,new}] for anything that changed. */
+function diffRecords(oldObj, newObj, labels = {}, skip = ['id', 'createdAt', 'updatedAt', 'version', 'companyName']) {
+  const changes = [];
+  const keys = new Set([...Object.keys(oldObj || {}), ...Object.keys(newObj || {})]);
+  keys.forEach((k) => {
+    if (skip.includes(k)) return;
+    const ov = oldObj ? oldObj[k] : undefined;
+    const nv = newObj ? newObj[k] : undefined;
+    const os = ov == null ? '' : String(ov);
+    const ns = nv == null ? '' : String(nv);
+    if (os !== ns) changes.push({ field: k, label: labels[k] || k, old: os, new: ns });
+  });
+  return changes;
+}
+
+
+/* ===== app.js ===== */
+/* ============================================================
+   app.js — Application state, routing, and view rendering
+   ============================================================ */
+
+const App = {
+  state: {
+    view: 'dashboard',
+    companies: [],
+    contacts: [],
+    tasks: [],
+    activities: [],
+    search: '',
+    filters: { segment: '', leadStatus: '', pipeline: '', assignedTo: '', priority: '' },
+    sort: { field: 'updatedAt', dir: 'desc' },
+    showArchived: false,
+    selectedIds: new Set(),
+    historyFilter: { range: 'all', entityType: '', action: '', search: '' },
+
+    // ----- Follow-up Management module -----
+    followups: [],
+    fuView: 'table', // table | calendar | analytics
+    fuSearch: '',
+    fuQuickFilter: '', // dueToday | overdue | upcoming | completedToday | highPriority | meetings | won | lost | ''
+    fuFilters: { companyId: '', assignedTo: '', stage: '', status: '', priority: '', method: '', outcome: '', from: '', to: '' },
+    fuSort: { field: 'nextFollowUpDate', dir: 'asc' },
+    fuPage: 1,
+    fuPageSize: 10,
+    fuCalendarDate: new Date(),
+  },
+
+  async init() {
+    try {
+      await this.reloadAll();
+    } catch (err) {
+      console.error('Storage init failed', err);
+      UI.toast('Could not reach Firebase — check your firebaseConfig and internet connection', 'error');
+    }
+    if (this.state.activities[0]) this.touchLastUpdated(this.state.activities[0].timestamp);
+    const savedTeam = await DB.getSetting('team', null);
+    if (savedTeam && Array.isArray(savedTeam) && savedTeam.length) {
+      OPTIONS.assignedTo.length = 0;
+      OPTIONS.assignedTo.push(...savedTeam);
+    } else {
+      await DB.setSetting('team', OPTIONS.assignedTo.slice());
+    }
+    this.applyTheme(await DB.getSetting('theme', 'dark'));
+    this.wireGlobalEvents();
+    this.route('dashboard');
+    this.wireRealtimeSync();
+  },
+
+  // Live sync: each collection pushes updates to every open browser the
+  // instant anyone adds, edits, or deletes a record — no refresh needed.
+  wireRealtimeSync() {
+    const refresh = (view) => { if (this.state.view === view) this.route(view); };
+    DB.companies.onChange(list => { this.state.companies = list; refresh('dashboard'); refresh('companies'); refresh('kanban'); });
+    DB.contacts.onChange(list => { this.state.contacts = list; refresh('contacts'); });
+    DB.tasks.onChange(list => { this.state.tasks = list; refresh('tasks'); });
+    DB.followups.onChange(list => { this.state.followups = list; refresh('followupmgmt'); });
+    DB.activities.onChange(list => {
+      this.state.activities = list.slice().sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      if (this.state.activities[0]) this.touchLastUpdated(this.state.activities[0].timestamp);
+      refresh('history'); refresh('dashboard');
+    });
+  },
+
+  async reloadAll() {
+    // Promise.allSettled so a corrupted/missing store doesn't take the
+    // whole app down — it just loads empty for that one store.
+    const results = await Promise.allSettled([
+      DB.companies.all(), DB.contacts.all(), DB.tasks.all(), DB.activities.all(), DB.followups.all()
+    ]);
+    const [companies, contacts, tasks, activities, followups] = results.map(r => r.status === 'fulfilled' ? (r.value || []) : []);
+    this.state.companies = companies;
+    this.state.contacts = contacts;
+    this.state.tasks = tasks;
+    this.state.followups = followups;
+    this.state.activities = activities.slice().sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    const rejected = results.filter(r => r.status === 'rejected');
+    if (rejected.length) {
+      console.error('Some stores failed to load', rejected);
+      if (rejected.length === results.length) {
+        // Every single read failed — this is almost always a Firestore setup
+        // problem (wrong project, Firestore not created, or locked-down
+        // security rules), not a data problem. Show it plainly on screen
+        // instead of a toast that disappears in 3 seconds.
+        const msg = rejected[0].reason?.message || String(rejected[0].reason);
+        showFirebaseBlockingScreen('⚠️ Could not read from Firestore / تعذّر القراءة من Firestore', [
+          `Error: ${UI.escapeHtml(msg)}`,
+          'This usually means: the Firestore database was never created for this project, the project ID in firebaseConfig is wrong, or the security rules are blocking reads.',
+          'المشكلة غالبًا: Firestore Database لسه متعملش Create للمشروع، أو الـ projectId في firebaseConfig غلط، أو الـ Security Rules واقفة قدام القراءة/الكتابة.',
+          'Check Firebase Console → Firestore Database (make sure it exists) and → Rules (make sure they allow read/write).'
+        ]);
+      } else {
+        UI.toast('Some data could not be loaded — check your connection', 'error');
+      }
+    }
+  },
+
+  /** Records a structured entry in the Activity Log (History page) and updates the top-bar Last Updated time. */
+  async logChange({ action, entityType, entityId = '', entityName = '', changes = [], snapshot = null, fullData = null, message = '' } = {}) {
+    const rec = {
+      id: uid('A'),
+      timestamp: nowISO(),
+      action,          // create | update | delete | restore | undo | import | export | settings
+      entityType,      // Company | Contact | Task | Data | Settings
+      entityId,
+      entityName,
+      changes,         // [{ field, label, old, new }]
+      snapshot,         // full record snapshot, used to Undo an update/create or Restore a delete
+      fullData,         // complete record data at the moment of this action, kept permanently for reference
+      message: message || this.describeChange(action, entityType, entityName, changes),
+      undone: false
+    };
+    await DB.activities.put(rec);
+    this.state.activities.unshift(rec);
+    this.touchLastUpdated(rec.timestamp);
+    if (this.state.view === 'history') this.renderHistory();
+    return rec;
+  },
+
+  // Kept for readability at call sites — legacy alias.
+  async logActivity(message, companyId = '') {
+    return this.logChange({ action: 'update', entityType: 'Company', entityId: companyId, message });
+  },
+
+  describeChange(action, entityType, entityName, changes) {
+    const name = entityName || 'record';
+    const verb = { create: 'Added', update: 'Updated', delete: 'Deleted', restore: 'Restored',
+      undo: 'Reverted', import: 'Imported', export: 'Exported', settings: 'Changed' }[action] || action;
+    if (changes && changes.length === 1) return `${verb} ${entityType} "${name}" — ${changes[0].label} changed`;
+    if (changes && changes.length > 1) return `${verb} ${entityType} "${name}" — ${changes.length} fields changed`;
+    return `${verb} ${entityType} "${name}"`;
+  },
+
+  touchLastUpdated(ts) {
+    const el = document.getElementById('last-updated-value');
+    if (!el) return;
+    const d = new Date(ts);
+    el.textContent = `${d.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })} · ${d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}`;
+  },
+
+  // ---------- Routing ----------
+  route(view) {
+    this.state.view = view;
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.view === view));
+    const map = {
+      dashboard: this.renderDashboard, companies: this.renderCompanies, kanban: this.renderKanban,
+      contacts: this.renderContacts, tasks: this.renderTasks, followupmgmt: this.renderFollowupMgmt,
+      history: this.renderHistory, settings: this.renderSettings
+    };
+    (map[view] || this.renderDashboard).call(this);
+  },
+
+  wireGlobalEvents() {
+    document.querySelectorAll('.nav-item').forEach(el => {
+      el.addEventListener('click', () => this.route(el.dataset.view));
+    });
+    document.getElementById('theme-toggle').addEventListener('click', () => this.toggleTheme());
+    document.getElementById('global-search').addEventListener('input', (e) => {
+      this.state.search = e.target.value.toLowerCase();
+      if (this.state.view === 'companies') this.renderCompanies();
+    });
+    document.getElementById('btn-import').addEventListener('click', () => document.getElementById('file-import').click());
+    document.getElementById('file-import').addEventListener('change', (e) => this.handleImport(e));
+    document.getElementById('btn-export').addEventListener('click', () => this.handleExport());
+    document.getElementById('btn-add-company').addEventListener('click', () => this.openCompanyForm());
+  },
+
+  toggleTheme() {
+    const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+    this.applyTheme(next);
+    DB.setSetting('theme', next);
+    this.logChange({ action: 'settings', entityType: 'Settings', entityName: 'Theme', message: `Theme changed to ${next} mode` });
+  },
+  applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    document.getElementById('theme-toggle').textContent = theme === 'light' ? '🌙' : '☀️';
+    if (this.state.view) setTimeout(() => this.route(this.state.view), 30);
+  },
+
+  // ---------- Derived data helpers ----------
+  visibleCompanies() {
+    const { search, filters, showArchived } = this.state;
+    return this.state.companies.filter(c => {
+      if (!showArchived && c.archived) return false;
+      if (showArchived && !c.archived) return false;
+      if (filters.segment && c.segment !== filters.segment) return false;
+      if (filters.leadStatus && c.leadStatus !== filters.leadStatus) return false;
+      if (filters.pipeline && c.pipeline !== filters.pipeline) return false;
+      if (filters.assignedTo && c.assignedTo !== filters.assignedTo) return false;
+      if (filters.priority && c.priority !== filters.priority) return false;
+      if (search) {
+        const hay = `${c.name} ${c.email} ${c.phone} ${c.website} ${c.notes} ${c.segment}`.toLowerCase();
+        if (!hay.includes(search)) return false;
+      }
+      return true;
+    }).sort((a, b) => {
+      const { field, dir } = this.state.sort;
+      let va = a[field] ?? '', vb = b[field] ?? '';
+      if (field === 'dealValue' || field === 'followUpCount') { va = Number(va) || 0; vb = Number(vb) || 0; }
+      const cmp = va > vb ? 1 : va < vb ? -1 : 0;
+      return dir === 'asc' ? cmp : -cmp;
+    });
+  },
+
+  kpis() {
+    const cs = this.state.companies.filter(c => !c.archived);
+    const today = UI.todayISO();
+    const in7 = UI.daysFromNow(7);
+    const total = cs.length;
+    const active = cs.filter(c => !['Deal closed', 'Lost'].includes(c.pipeline)).length;
+    const leads = cs.filter(c => ['Lead', 'Qualified Lead'].includes(c.leadStatus)).length;
+    const opportunities = cs.filter(c => ['Proposal sent', 'Negotiation', 'Contract sent'].includes(c.pipeline)).length;
+    const closed = cs.filter(c => c.pipeline === 'Deal closed').length;
+    const lost = cs.filter(c => c.pipeline === 'Lost').length;
+    const followUpsToday = cs.filter(c => c.nextFollowUp === today).length;
+    const followUpsTotal = cs.reduce((s, c) => s + (Number(c.followUpCount) || 0), 0);
+    const upcoming = cs.filter(c => c.nextFollowUp && c.nextFollowUp > today && c.nextFollowUp <= in7).length;
+    const overdue = cs.filter(c => c.nextFollowUp && c.nextFollowUp < today && !['Deal closed', 'Lost'].includes(c.pipeline)).length;
+    const revenue = cs.filter(c => c.pipeline === 'Deal closed').reduce((s, c) => s + (Number(c.dealValue) || 0), 0);
+    const now = new Date();
+    const monthRevenue = cs.filter(c => c.pipeline === 'Deal closed' && c.updatedAt && new Date(c.updatedAt).getMonth() === now.getMonth() && new Date(c.updatedAt).getFullYear() === now.getFullYear())
+      .reduce((s, c) => s + (Number(c.dealValue) || 0), 0);
+    const conversion = total ? Math.round((closed / total) * 1000) / 10 : 0;
+    return { total, active, leads, opportunities, closed, lost, followUpsToday, followUpsTotal, upcoming, overdue, revenue, monthRevenue, conversion };
+  },
+
+  countBy(arr, field, options) {
+    const out = {};
+    (options || [...new Set(arr.map(a => a[field]).filter(Boolean))]).forEach(k => out[k] = 0);
+    arr.forEach(a => { const v = a[field] || 'Unspecified'; out[v] = (out[v] || 0) + 1; });
+    return out;
+  },
+
+  // ---------- DASHBOARD ----------
+  renderDashboard() {
+    const k = this.kpis();
+    const cs = this.state.companies.filter(c => !c.archived);
+    const cards = [
+      ['Total Companies', k.total, '🏢', ''],
+      ['Active Pipeline', k.active, '⚡', ''],
+      ['Leads', k.leads, '🎯', ''],
+      ['Opportunities', k.opportunities, '📈', ''],
+      ['Closed Deals', k.closed, '✅', 'good'],
+      ['Lost Deals', k.lost, '✕', 'bad'],
+      ['Follow-ups Today', k.followUpsToday, '📅', k.followUpsToday ? 'warn' : ''],
+      ['Total Follow-ups Done', k.followUpsTotal, '🔁', 'good'],
+      ['Overdue Follow-ups', k.overdue, '⏰', k.overdue ? 'bad' : ''],
+      ['Upcoming (7d)', k.upcoming, '🔭', ''],
+      ['Revenue (Closed)', UI.fmtMoney(k.revenue), '💰', 'good'],
+      ['Revenue (This Month)', UI.fmtMoney(k.monthRevenue), '💵', ''],
+      ['Conversion Rate', k.conversion + '%', '🎢', ''],
+    ];
+
+    const main = document.getElementById('main');
+    main.innerHTML = `
+      <div class="view-header">
+        <h1>Dashboard</h1>
+        <p class="sub">Live overview of your pipeline — updates instantly as you work.</p>
+      </div>
+      <div class="kpi-grid">
+        ${cards.map(([label, val, icon, tone], i) => `
+          <div class="kpi-card" style="animation-delay:${i * 30}ms">
+            <div class="kpi-icon">${icon}</div>
+            <div class="kpi-value ${tone}">${val}</div>
+            <div class="kpi-label">${label}</div>
+          </div>`).join('')}
+      </div>
+      <div class="chart-grid">
+        <div class="panel">
+          <h3>Sales Funnel</h3>
+          <canvas id="chart-funnel" height="220"></canvas>
+        </div>
+        <div class="panel">
+          <h3>Lead Sources</h3>
+          <canvas id="chart-sources" height="220"></canvas>
+        </div>
+        <div class="panel">
+          <h3>6-Month Trend</h3>
+          <canvas id="chart-trend" height="220"></canvas>
+        </div>
+        <div class="panel">
+          <h3>Lead Status Mix</h3>
+          <canvas id="chart-status" height="220"></canvas>
+        </div>
+      </div>
+      <div class="bottom-grid">
+        <div class="panel">
+          <h3>Recent Activity</h3>
+          <div class="activity-list">
+            ${this.state.activities.slice(0, 10).map(a => `
+              <div class="activity-row">
+                <span class="dot"></span>
+                <div><div class="activity-msg">${UI.escapeHtml(a.message)}</div>
+                <div class="activity-time">${new Date(a.timestamp).toLocaleString()}</div></div>
+              </div>`).join('') || '<p class="empty-hint">No activity yet — add your first company to get started.</p>'}
+          </div>
+          ${this.state.activities.length ? '<button class="btn btn-ghost btn-sm" id="view-all-activity" style="margin-top:12px;width:100%;">View Full History</button>' : ''}
+        </div>
+        <div class="panel">
+          <h3>Quick Actions</h3>
+          <div class="quick-actions">
+            <button class="btn btn-primary" id="qa-add">+ Add Company</button>
+            <button class="btn btn-ghost" id="qa-kanban">View Pipeline</button>
+            <button class="btn btn-ghost" id="qa-tasks">View Follow-ups</button>
+            <button class="btn btn-ghost" id="qa-export">Export Excel</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('qa-add').onclick = () => this.openCompanyForm();
+    document.getElementById('qa-kanban').onclick = () => this.route('kanban');
+    document.getElementById('qa-tasks').onclick = () => this.route('tasks');
+    document.getElementById('qa-export').onclick = () => this.handleExport();
+    const viewAllBtn = document.getElementById('view-all-activity');
+    if (viewAllBtn) viewAllBtn.onclick = () => this.route('history');
+
+    Charts.renderFunnel('chart-funnel', this.countBy(cs, 'pipeline', OPTIONS.pipeline));
+    Charts.renderLeadSources('chart-sources', this.countBy(cs, 'leadSource', OPTIONS.leadSource));
+    Charts.renderLeadStatus('chart-status', this.countBy(cs, 'leadStatus', OPTIONS.leadStatus));
+
+    const months = [...Array(6)].map((_, i) => { const d = new Date(); d.setMonth(d.getMonth() - (5 - i)); return d; });
+    const labels = months.map(d => d.toLocaleString(undefined, { month: 'short' }));
+    const created = months.map(d => cs.filter(c => c.createdAt && new Date(c.createdAt).getMonth() === d.getMonth() && new Date(c.createdAt).getFullYear() === d.getFullYear()).length);
+    const closedM = months.map(d => cs.filter(c => c.pipeline === 'Deal closed' && c.updatedAt && new Date(c.updatedAt).getMonth() === d.getMonth() && new Date(c.updatedAt).getFullYear() === d.getFullYear()).length);
+    Charts.renderMonthlyTrend('chart-trend', labels, created, closedM);
+  },
+
+  // ---------- COMPANIES TABLE ----------
+  renderCompanies() {
+    const list = this.visibleCompanies();
+    const main = document.getElementById('main');
+    main.innerHTML = `
+      <div class="view-header row">
+        <div><h1>Companies</h1><p class="sub">${list.length} of ${this.state.companies.filter(c => this.state.showArchived ? c.archived : !c.archived).length} shown</p></div>
+        <div class="header-actions">
+          <button class="btn btn-ghost" id="toggle-archived">${this.state.showArchived ? '📁 Show Active' : '🗄 Show Archived'}</button>
+          <button class="btn btn-primary" id="add-company-2">+ Add Company</button>
+        </div>
+      </div>
+      <div class="filter-bar">
+        ${this.filterSelect('segment', 'Segment', OPTIONS.segment)}
+        ${this.filterSelect('leadStatus', 'Lead Status', OPTIONS.leadStatus)}
+        ${this.filterSelect('pipeline', 'Pipeline', OPTIONS.pipeline)}
+        ${this.filterSelect('priority', 'Priority', OPTIONS.priority)}
+        ${this.filterSelect('assignedTo', 'Assigned To', OPTIONS.assignedTo)}
+        ${Object.values(this.state.filters).some(Boolean) ? '<button class="btn btn-ghost btn-sm" id="clear-filters">Clear filters</button>' : ''}
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th style="width:28px"><input type="checkbox" id="select-all"></th>
+            ${this.sortableTh('name', 'Company')}
+            ${this.sortableTh('segment', 'Segment')}
+            ${this.sortableTh('priority', 'Priority')}
+            ${this.sortableTh('leadStatus', 'Lead Status')}
+            ${this.sortableTh('pipeline', 'Pipeline')}
+            ${this.sortableTh('nextFollowUp', 'Next Follow-up')}
+            ${this.sortableTh('assignedTo', 'Assigned')}
+            ${this.sortableTh('dealValue', 'Deal Value')}
+            <th></th>
+          </tr></thead>
+          <tbody>
+            ${list.map(c => this.companyRow(c)).join('') || `<tr><td colspan="10" class="empty-cell">No companies yet. <a href="#" id="empty-add">Add your first one</a> or import your Excel file.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+      <div class="bulk-bar" id="bulk-bar" hidden>
+        <span id="bulk-count"></span>
+        <button class="btn btn-sm btn-danger" id="bulk-delete">Delete selected</button>
+        <button class="btn btn-sm btn-ghost" id="bulk-archive">Archive selected</button>
+      </div>
+    `;
+
+    document.getElementById('add-company-2').onclick = () => this.openCompanyForm();
+    const emptyAdd = document.getElementById('empty-add');
+    if (emptyAdd) emptyAdd.onclick = (e) => { e.preventDefault(); this.openCompanyForm(); };
+    document.getElementById('toggle-archived').onclick = () => { this.state.showArchived = !this.state.showArchived; this.renderCompanies(); };
+    const clearBtn = document.getElementById('clear-filters');
+    if (clearBtn) clearBtn.onclick = () => { this.state.filters = { segment: '', leadStatus: '', pipeline: '', assignedTo: '', priority: '' }; this.renderCompanies(); };
+
+    main.querySelectorAll('.filter-select').forEach(sel => {
+      sel.addEventListener('change', () => { this.state.filters[sel.dataset.field] = sel.value; this.renderCompanies(); });
+    });
+    main.querySelectorAll('.sortable').forEach(th => {
+      th.addEventListener('click', () => {
+        const f = th.dataset.field;
+        if (this.state.sort.field === f) this.state.sort.dir = this.state.sort.dir === 'asc' ? 'desc' : 'asc';
+        else this.state.sort = { field: f, dir: 'asc' };
+        this.renderCompanies();
+      });
+    });
+    main.querySelectorAll('.row-edit').forEach(btn => btn.addEventListener('click', () => this.openCompanyForm(btn.dataset.id)));
+    main.querySelectorAll('.row-followup').forEach(btn => btn.addEventListener('click', () => this.openFollowUpForm('Company', btn.dataset.id)));
+    main.querySelectorAll('.row-delete').forEach(btn => btn.addEventListener('click', () => this.deleteCompany(btn.dataset.id)));
+    main.querySelectorAll('.row-select').forEach(cb => cb.addEventListener('change', () => this.updateBulkBar()));
+    const selectAll = document.getElementById('select-all');
+    if (selectAll) selectAll.addEventListener('change', (e) => {
+      main.querySelectorAll('.row-select').forEach(cb => cb.checked = e.target.checked);
+      this.updateBulkBar();
+    });
+    const bulkDelete = document.getElementById('bulk-delete');
+    if (bulkDelete) bulkDelete.onclick = () => this.bulkDelete();
+    const bulkArchive = document.getElementById('bulk-archive');
+    if (bulkArchive) bulkArchive.onclick = () => this.bulkArchive();
+  },
+
+  filterSelect(field, label, options) {
+    const val = this.state.filters[field];
+    return `<select class="filter-select" data-field="${field}">
+      <option value="">${label}: All</option>
+      ${options.map(o => `<option value="${o}" ${o === val ? 'selected' : ''}>${o}</option>`).join('')}
+    </select>`;
+  },
+
+  sortableTh(field, label) {
+    const { field: sf, dir } = this.state.sort;
+    const arrow = sf === field ? (dir === 'asc' ? ' ↑' : ' ↓') : '';
+    return `<th class="sortable" data-field="${field}">${label}${arrow}</th>`;
+  },
+
+  companyRow(c) {
+    const overdue = c.nextFollowUp && c.nextFollowUp < UI.todayISO() && !['Deal closed', 'Lost'].includes(c.pipeline);
+    return `<tr>
+      <td><input type="checkbox" class="row-select" data-id="${c.id}"></td>
+      <td><div class="cell-main">${UI.escapeHtml(c.name) || '<em>Unnamed</em>'}</div><div class="cell-sub">${UI.escapeHtml(c.email) || UI.escapeHtml(c.website) || ''}</div></td>
+      <td>${c.segment ? `<span class="chip">${c.segment}</span>` : '—'}</td>
+      <td>${c.priority ? `<span class="chip prio-${c.priority}">${c.priority}</span>` : '—'}</td>
+      <td><span class="chip status-${(c.leadStatus || '').replace(/\s/g, '')}">${c.leadStatus || '—'}</span></td>
+      <td><span class="chip stage">${c.pipeline || '—'}</span></td>
+      <td class="${overdue ? 'text-danger' : ''}">${UI.fmtDate(c.nextFollowUp)}${overdue ? ' ⚠️' : ''}<span class="fu-count" title="Follow-ups done so far">🔁 ${Number(c.followUpCount) || 0}</span></td>
+      <td>${UI.escapeHtml(c.assignedTo) || '—'}</td>
+      <td>${UI.fmtMoney(c.dealValue)}</td>
+      <td class="row-actions">
+        <button class="icon-btn row-followup" data-id="${c.id}" title="Log Follow-up">🔁</button>
+        <button class="icon-btn row-edit" data-id="${c.id}" title="Edit">✎</button>
+        <button class="icon-btn row-delete" data-id="${c.id}" title="Delete">🗑</button>
+      </td>
+    </tr>`;
+  },
+
+  updateBulkBar() {
+    const ids = [...document.querySelectorAll('.row-select:checked')].map(cb => cb.dataset.id);
+    const bar = document.getElementById('bulk-bar');
+    bar.hidden = ids.length === 0;
+    document.getElementById('bulk-count').textContent = `${ids.length} selected`;
+    this._selectedIds = ids;
+  },
+
+  async bulkDelete() {
+    const ids = this._selectedIds || [];
+    if (!ids.length) return;
+    const ok = await UI.confirm(`Permanently delete ${ids.length} companies? This cannot be undone.`, { requirePassword: true });
+    if (!ok) return;
+    const toDelete = this.state.companies.filter(c => ids.includes(c.id));
+    for (const c of toDelete) {
+      const relatedContacts = this.state.contacts.filter(x => x.companyId === c.id);
+      await DB.companies.delete(c.id);
+      for (const rc of relatedContacts) await DB.contacts.delete(rc.id);
+      await this.logChange({
+        action: 'delete', entityType: 'Company', entityId: c.id, entityName: c.name,
+        snapshot: { ...c, _relatedContacts: relatedContacts }, fullData: { ...c }
+      });
+    }
+    this.state.companies = this.state.companies.filter(c => !ids.includes(c.id));
+    this.state.contacts = this.state.contacts.filter(c => !ids.includes(c.companyId));
+    UI.toast(`${ids.length} companies deleted`, 'success');
+    this.renderCompanies();
+  },
+
+  async bulkArchive() {
+    const ids = this._selectedIds || [];
+    if (!ids.length) return;
+    for (const id of ids) {
+      const c = this.state.companies.find(x => x.id === id);
+      if (c) {
+        const before = { ...c };
+        c.archived = true;
+        c.updatedAt = nowISO();
+        c.version = (Number(c.version) || 1) + 1;
+        await DB.companies.put(c);
+        await this.logChange({
+          action: 'update', entityType: 'Company', entityId: c.id, entityName: c.name,
+          changes: diffRecords(before, c, COMPANY_FIELD_LABELS), snapshot: before, fullData: { ...c }
+        });
+      }
+    }
+    UI.toast(`${ids.length} companies archived`, 'success');
+    this.renderCompanies();
+  },
+
+  // ---------- COMPANY FORM (add/edit) ----------
+  openCompanyForm(id) {
+    const editing = !!id;
+    const c = editing ? this.state.companies.find(x => x.id === id) : blankCompany();
+    UI.openModal(`
+      <div class="modal">
+        <h3>${editing ? 'Edit Company' : 'Add Company'}${editing ? `<span class="ver-badge">Version ${c.version || 1}</span>` : ''}</h3>
+        <form id="company-form" class="form-grid">
+          <label>Company Name*<input required name="name" value="${UI.escapeHtml(c.name)}" placeholder="Acme Hotels Group"></label>
+          <label>Website<input name="website" value="${UI.escapeHtml(c.website)}" placeholder="acme.com"></label>
+          <label>Email<input type="email" name="email" value="${UI.escapeHtml(c.email)}"></label>
+          <label>Phone<input name="phone" value="${UI.escapeHtml(c.phone)}"></label>
+          <label>Segment<select name="segment">${UI.optionsHtml(OPTIONS.segment, c.segment)}</select></label>
+          <label>Priority<select name="priority">${UI.optionsHtml(OPTIONS.priority, c.priority)}</select></label>
+          <label>Lead Source<select name="leadSource">${UI.optionsHtml(OPTIONS.leadSource, c.leadSource)}</select></label>
+          <label>Lead Status<select name="leadStatus">${UI.optionsHtml(OPTIONS.leadStatus, c.leadStatus)}</select></label>
+          <label>Response Status<select name="responseStatus">${UI.optionsHtml(OPTIONS.responseStatus, c.responseStatus)}</select></label>
+          <label>Sales Pipeline<select name="pipeline">${UI.optionsHtml(OPTIONS.pipeline, c.pipeline)}</select></label>
+          <label>Assigned To<select name="assignedTo">${UI.optionsHtml(OPTIONS.assignedTo, c.assignedTo)}</select></label>
+          <label>Deal Value ($)<input type="number" name="dealValue" value="${c.dealValue || 0}"></label>
+          <label>Last Contact Date<input type="date" name="lastContactDate" value="${c.lastContactDate || ''}"></label>
+          <label>Next Follow-up<input type="date" name="nextFollowUp" value="${c.nextFollowUp || ''}">${editing ? `<span class="fu-count-hint">🔁 Follow-ups done so far: ${Number(c.followUpCount) || 0}</span>` : ''}</label>
+          <label class="span-2">Notes<textarea name="notes" rows="3" placeholder="Context, history, anything useful next time...">${UI.escapeHtml(c.notes)}</textarea></label>
+          <div class="modal-actions span-2">
+            <button type="button" class="btn btn-ghost" id="cancel-form">Cancel</button>
+            <button type="submit" class="btn btn-primary">${editing ? 'Save Changes' : 'Add Company'}</button>
+          </div>
+        </form>
+      </div>
+    `);
+    document.getElementById('cancel-form').onclick = () => UI.closeModal();
+    document.getElementById('company-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const before = editing ? { ...c } : null;
+      const updated = { ...c };
+      for (const [k, v] of fd.entries()) updated[k] = v;
+      updated.dealValue = Number(updated.dealValue) || 0;
+      updated.followUpCount = editing ? (Number(c.followUpCount) || 0) : 0;
+      updated.updatedAt = nowISO();
+      updated.version = editing ? (Number(c.version) || 1) + 1 : 1;
+      if (!editing) updated.createdAt = nowISO();
+      await DB.companies.put(updated);
+      const idx = this.state.companies.findIndex(x => x.id === updated.id);
+      if (idx >= 0) this.state.companies[idx] = updated; else this.state.companies.unshift(updated);
+      const changes = editing ? diffRecords(before, updated, COMPANY_FIELD_LABELS) : [];
+      await this.logChange({
+        action: editing ? 'update' : 'create', entityType: 'Company',
+        entityId: updated.id, entityName: updated.name, changes, snapshot: before, fullData: { ...updated }
+      });
+      UI.toast(`${updated.name || 'Company'} saved`, 'success');
+      UI.closeModal();
+      this.route(this.state.view);
+    });
+  },
+
+  async deleteCompany(id) {
+    const c = this.state.companies.find(x => x.id === id);
+    const ok = await UI.confirm(`Delete "${c?.name || id}" permanently? This also removes linked contacts.`, { requirePassword: true });
+    if (!ok) return;
+    const relatedContacts = this.state.contacts.filter(x => x.companyId === id);
+    await DB.companies.delete(id);
+    for (const rc of relatedContacts) await DB.contacts.delete(rc.id);
+    this.state.companies = this.state.companies.filter(x => x.id !== id);
+    this.state.contacts = this.state.contacts.filter(x => x.companyId !== id);
+    await this.logChange({
+      action: 'delete', entityType: 'Company', entityId: id, entityName: c?.name || id,
+      snapshot: c ? { ...c, _relatedContacts: relatedContacts } : null, fullData: c ? { ...c } : null
+    });
+    UI.toast('Company deleted', 'success');
+    this.route(this.state.view);
+  },
+
+  // ---------- FOLLOW-UP LOGGING ----------
+  // Follow-up counts are ONLY incremented here, by explicitly logging what was
+  // discussed/done — not automatically when a date field changes.
+  openFollowUpForm(entityType, id) {
+    const store = entityType === 'Company' ? this.state.companies : this.state.contacts;
+    const rec = store.find(x => x.id === id);
+    if (!rec) return;
+    UI.openModal(`
+      <div class="modal modal-sm">
+        <h3>Log Follow-up — ${UI.escapeHtml(rec.name) || entityType}</h3>
+        <p class="modal-msg">Follow-ups so far: <strong>${Number(rec.followUpCount) || 0}</strong>. Write what happened in this follow-up, then confirm to count it.</p>
+        <form id="followup-form">
+          <label class="fu-form-label">Follow-up details*
+            <textarea id="followup-text" rows="4" required placeholder="e.g. Called and discussed pricing, sending proposal next week..."></textarea>
+          </label>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" id="cancel-fform">Cancel</button>
+            <button type="submit" class="btn btn-primary">Log Follow-up</button>
+          </div>
+        </form>
+        ${(rec.followUpLog || []).length ? `
+        <div class="fu-history">
+          <h4>Past follow-ups</h4>
+          <ul class="fu-history-list">
+            ${[...(rec.followUpLog || [])].reverse().map(f => `
+              <li><span class="fu-history-date">${UI.fmtDate(f.date)}</span><span class="fu-history-text">${UI.escapeHtml(f.text)}</span></li>`).join('')}
+          </ul>
+        </div>` : ''}
+      </div>
+    `);
+    document.getElementById('cancel-fform').onclick = () => UI.closeModal();
+    document.getElementById('followup-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = document.getElementById('followup-text').value.trim();
+      if (!text) return;
+      await this.logFollowUp(entityType, id, text);
+      UI.closeModal();
+    });
+  },
+
+  async logFollowUp(entityType, id, text) {
+    const isCompany = entityType === 'Company';
+    const store = isCompany ? this.state.companies : this.state.contacts;
+    const dbStore = isCompany ? DB.companies : DB.contacts;
+    const rec = store.find(x => x.id === id);
+    if (!rec) return;
+    const before = { ...rec };
+    const today = UI.todayISO();
+    rec.followUpCount = (Number(rec.followUpCount) || 0) + 1;
+    rec.followUpLog = [...(rec.followUpLog || []), { date: today, text }];
+    rec.lastContactDate = today;
+    rec.updatedAt = nowISO();
+    rec.version = (Number(rec.version) || 1) + 1;
+    await dbStore.put(rec);
+    await this.logChange({
+      action: 'followup', entityType, entityId: rec.id, entityName: rec.name,
+      message: `Logged follow-up with ${rec.name}: ${text}`, snapshot: before, fullData: { ...rec }
+    });
+    UI.toast('Follow-up logged', 'success');
+    this.route(this.state.view);
+  },
+
+  // ---------- KANBAN ----------
+  renderKanban() {
+    const stages = OPTIONS.pipeline;
+    const cs = this.state.companies.filter(c => !c.archived);
+    const main = document.getElementById('main');
+    main.innerHTML = `
+      <div class="view-header">
+        <h1>Lead Pipeline</h1>
+        <p class="sub">Drag cards between stages to update a company's pipeline instantly.</p>
+      </div>
+      <div class="kanban-board">
+        ${stages.map(stage => {
+          const items = cs.filter(c => c.pipeline === stage);
+          return `<div class="kanban-col" data-stage="${stage}">
+            <div class="kanban-col-head"><span>${stage}</span><span class="kanban-count">${items.length}</span></div>
+            <div class="kanban-drop" data-stage="${stage}">
+              ${items.map(c => `
+                <div class="kanban-card" draggable="true" data-id="${c.id}">
+                  <div class="kc-title">${UI.escapeHtml(c.name) || '<em>Unnamed</em>'}</div>
+                  <div class="kc-meta"><span class="chip prio-${c.priority}">${c.priority || '—'}</span>${c.dealValue ? `<span class="kc-value">${UI.fmtMoney(c.dealValue)}</span>` : ''}</div>
+                  <div class="kc-meta-sub">${c.assignedTo ? `👤 ${UI.escapeHtml(c.assignedTo)}` : ''} ${c.nextFollowUp ? `· 📅 ${UI.fmtDate(c.nextFollowUp)}` : ''} · 🔁 ${Number(c.followUpCount) || 0}</div>
+                </div>`).join('')}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+    this.wireKanbanDnD();
+  },
+
+  wireKanbanDnD() {
+    let dragged = null;
+    document.querySelectorAll('.kanban-card').forEach(card => {
+      card.addEventListener('dragstart', () => { dragged = card; card.classList.add('dragging'); });
+      card.addEventListener('dragend', () => { card.classList.remove('dragging'); dragged = null; });
+      card.addEventListener('click', () => this.openCompanyForm(card.dataset.id));
+    });
+    document.querySelectorAll('.kanban-drop').forEach(zone => {
+      zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drop-hover'); });
+      zone.addEventListener('dragleave', () => zone.classList.remove('drop-hover'));
+      zone.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        zone.classList.remove('drop-hover');
+        if (!dragged) return;
+        const id = dragged.dataset.id;
+        const stage = zone.dataset.stage;
+        const c = this.state.companies.find(x => x.id === id);
+        if (c && c.pipeline !== stage) {
+          const before = { ...c };
+          const from = c.pipeline;
+          c.pipeline = stage;
+          c.updatedAt = nowISO();
+          c.version = (Number(c.version) || 1) + 1;
+          await DB.companies.put(c);
+          await this.logChange({
+            action: 'update', entityType: 'Company', entityId: c.id, entityName: c.name,
+            changes: [{ field: 'pipeline', label: 'Sales Pipeline', old: from, new: stage }], snapshot: before, fullData: { ...c }
+          });
+          UI.toast(`Moved to ${stage}`, 'success');
+          this.renderKanban();
+        }
+      });
+    });
+  },
+
+  // ---------- CONTACTS ----------
+  renderContacts() {
+    const main = document.getElementById('main');
+    const contacts = this.state.contacts;
+    main.innerHTML = `
+      <div class="view-header row">
+        <div><h1>Contacts</h1><p class="sub">${contacts.length} decision-maker contacts</p></div>
+        <div class="header-actions"><button class="btn btn-primary" id="add-contact">+ Add Contact</button></div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Company</th><th>Title</th><th>Email</th><th>Phone</th><th>Lead Status</th><th>Next Follow-up</th><th></th></tr></thead>
+          <tbody>
+            ${contacts.map(ct => `<tr>
+              <td class="cell-main">${UI.escapeHtml(ct.name) || '<em>Unnamed</em>'}</td>
+              <td>${UI.escapeHtml(ct.companyName) || '—'}</td>
+              <td>${UI.escapeHtml(ct.jobTitle) || '—'}</td>
+              <td>${UI.escapeHtml(ct.email) || '—'}</td>
+              <td>${UI.escapeHtml(ct.phone) || '—'}</td>
+              <td><span class="chip status-${(ct.leadStatus || '').replace(/\s/g, '')}">${ct.leadStatus || '—'}</span></td>
+              <td>${UI.fmtDate(ct.nextFollowUp)}<span class="fu-count" title="Follow-ups done so far">🔁 ${Number(ct.followUpCount) || 0}</span></td>
+              <td class="row-actions">
+                <button class="icon-btn c-followup" data-id="${ct.id}" title="Log Follow-up">🔁</button>
+                <button class="icon-btn c-edit" data-id="${ct.id}" title="Edit">✎</button>
+                <button class="icon-btn c-delete" data-id="${ct.id}" title="Delete">🗑</button>
+              </td>
+            </tr>`).join('') || `<tr><td colspan="8" class="empty-cell">No contacts yet.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    `;
+    document.getElementById('add-contact').onclick = () => this.openContactForm();
+    main.querySelectorAll('.c-edit').forEach(b => b.addEventListener('click', () => this.openContactForm(b.dataset.id)));
+    main.querySelectorAll('.c-followup').forEach(b => b.addEventListener('click', () => this.openFollowUpForm('Contact', b.dataset.id)));
+    main.querySelectorAll('.c-delete').forEach(b => b.addEventListener('click', () => this.deleteContact(b.dataset.id)));
+  },
+
+  openContactForm(id) {
+    const editing = !!id;
+    const ct = editing ? this.state.contacts.find(x => x.id === id) : blankContact();
+    const companyOptions = this.state.companies.map(c => `<option value="${c.id}" ${c.id === ct.companyId ? 'selected' : ''}>${UI.escapeHtml(c.name) || c.id}</option>`).join('');
+    UI.openModal(`
+      <div class="modal">
+        <h3>${editing ? 'Edit Contact' : 'Add Contact'}${editing ? `<span class="ver-badge">Version ${ct.version || 1}</span>` : ''}</h3>
+        <form id="contact-form" class="form-grid">
+          <label>Full Name*<input required name="name" value="${UI.escapeHtml(ct.name)}"></label>
+          <label>Company<select name="companyId"><option value="">—</option>${companyOptions}</select></label>
+          <label>Job Title<input name="jobTitle" value="${UI.escapeHtml(ct.jobTitle)}"></label>
+          <label>LinkedIn<input name="linkedin" value="${UI.escapeHtml(ct.linkedin)}"></label>
+          <label>Email<input type="email" name="email" value="${UI.escapeHtml(ct.email)}"></label>
+          <label>Phone<input name="phone" value="${UI.escapeHtml(ct.phone)}"></label>
+          <label>Best Time to Contact<select name="bestTime">${UI.optionsHtml(OPTIONS.bestTimeToContact, ct.bestTime)}</select></label>
+          <label>Lead Status<select name="leadStatus">${UI.optionsHtml(OPTIONS.leadStatus, ct.leadStatus)}</select></label>
+          <label>Next Follow-up<input type="date" name="nextFollowUp" value="${ct.nextFollowUp || ''}">${editing ? `<span class="fu-count-hint">🔁 Follow-ups done so far: ${Number(ct.followUpCount) || 0}</span>` : ''}</label>
+          <label>Assigned To<select name="assignedTo">${UI.optionsHtml(OPTIONS.assignedTo, ct.assignedTo)}</select></label>
+          <label class="span-2">Notes<textarea name="notes" rows="3">${UI.escapeHtml(ct.notes)}</textarea></label>
+          <div class="modal-actions span-2">
+            <button type="button" class="btn btn-ghost" id="cancel-cform">Cancel</button>
+            <button type="submit" class="btn btn-primary">${editing ? 'Save Changes' : 'Add Contact'}</button>
+          </div>
+        </form>
+      </div>
+    `);
+    document.getElementById('cancel-cform').onclick = () => UI.closeModal();
+    document.getElementById('contact-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const before = editing ? { ...ct } : null;
+      const updated = { ...ct };
+      for (const [k, v] of fd.entries()) updated[k] = v;
+      const company = this.state.companies.find(c => c.id === updated.companyId);
+      updated.companyName = company ? company.name : '';
+      updated.followUpCount = editing ? (Number(ct.followUpCount) || 0) : 0;
+      updated.updatedAt = nowISO();
+      updated.version = editing ? (Number(ct.version) || 1) + 1 : 1;
+      if (!editing) updated.createdAt = nowISO();
+      await DB.contacts.put(updated);
+      const idx = this.state.contacts.findIndex(x => x.id === updated.id);
+      if (idx >= 0) this.state.contacts[idx] = updated; else this.state.contacts.unshift(updated);
+      const changes = editing ? diffRecords(before, updated, CONTACT_FIELD_LABELS) : [];
+      await this.logChange({
+        action: editing ? 'update' : 'create', entityType: 'Contact',
+        entityId: updated.id, entityName: updated.name, changes, snapshot: before, fullData: { ...updated }
+      });
+      UI.toast(`${updated.name || 'Contact'} saved`, 'success');
+      UI.closeModal();
+      this.route('contacts');
+    });
+  },
+
+  async deleteContact(id) {
+    const ct = this.state.contacts.find(x => x.id === id);
+    const ok = await UI.confirm('Delete this contact permanently?', { requirePassword: true });
+    if (!ok) return;
+    await DB.contacts.delete(id);
+    this.state.contacts = this.state.contacts.filter(x => x.id !== id);
+    await this.logChange({
+      action: 'delete', entityType: 'Contact', entityId: id, entityName: ct?.name || id, snapshot: ct || null, fullData: ct ? { ...ct } : null
+    });
+    UI.toast('Contact deleted', 'success');
+    this.route('contacts');
+  },
+
+  // ---------- TASKS / FOLLOW-UPS ----------
+  renderTasks() {
+    const today = UI.todayISO();
+    const cs = this.state.companies.filter(c => !c.archived && c.nextFollowUp);
+    const overdue = cs.filter(c => c.nextFollowUp < today && !['Deal closed', 'Lost'].includes(c.pipeline));
+    const dueToday = cs.filter(c => c.nextFollowUp === today);
+    const upcoming = cs.filter(c => c.nextFollowUp > today).sort((a, b) => a.nextFollowUp.localeCompare(b.nextFollowUp));
+    const tasks = this.state.tasks;
+
+    const main = document.getElementById('main');
+    main.innerHTML = `
+      <div class="view-header row">
+        <div><h1>Follow-ups & Tasks</h1><p class="sub">Everything that needs your attention.</p></div>
+        <div class="header-actions"><button class="btn btn-primary" id="add-task">+ New Task</button></div>
+      </div>
+      <div class="followup-grid">
+        ${this.followupPanel('⏰ Overdue', overdue, 'bad')}
+        ${this.followupPanel('📅 Due Today', dueToday, 'warn')}
+        ${this.followupPanel('🔭 Upcoming', upcoming, '')}
+      </div>
+      <div class="panel" style="margin-top:20px">
+        <h3>Tasks</h3>
+        <div class="task-list">
+          ${tasks.map(t => `
+            <div class="task-row ${t.status === 'Completed' ? 'done' : ''}">
+              <input type="checkbox" class="task-check" data-id="${t.id}" ${t.status === 'Completed' ? 'checked' : ''}>
+              <div class="task-info">
+                <div class="task-title">${UI.escapeHtml(t.title)}</div>
+                <div class="task-sub">${UI.escapeHtml(t.companyName) || ''} ${t.dueDate ? '· due ' + UI.fmtDate(t.dueDate) : ''} ${t.assignedTo ? '· ' + UI.escapeHtml(t.assignedTo) : ''}</div>
+              </div>
+              <span class="chip prio-${t.priority}">${t.priority}</span>
+              <button class="icon-btn t-delete" data-id="${t.id}">🗑</button>
+            </div>`).join('') || '<p class="empty-hint">No tasks yet.</p>'}
+        </div>
+      </div>
+    `;
+    document.getElementById('add-task').onclick = () => this.openTaskForm();
+    main.querySelectorAll('.task-check').forEach(cb => cb.addEventListener('change', () => this.toggleTask(cb.dataset.id, cb.checked)));
+    main.querySelectorAll('.t-delete').forEach(b => b.addEventListener('click', () => this.deleteTask(b.dataset.id)));
+    main.querySelectorAll('.followup-item').forEach(el => el.addEventListener('click', () => this.openCompanyForm(el.dataset.id)));
+  },
+
+  followupPanel(title, items, tone) {
+    return `<div class="panel">
+      <h3 class="${tone === 'bad' ? 'text-danger' : tone === 'warn' ? 'text-warn' : ''}">${title} <span class="count-badge">${items.length}</span></h3>
+      <div class="followup-list">
+        ${items.slice(0, 12).map(c => `
+          <div class="followup-item" data-id="${c.id}">
+            <div>${UI.escapeHtml(c.name) || '<em>Unnamed</em>'}</div>
+            <div class="followup-date">${UI.fmtDate(c.nextFollowUp)}</div>
+          </div>`).join('') || '<p class="empty-hint">Nothing here.</p>'}
+      </div>
+    </div>`;
+  },
+
+  openTaskForm() {
+    const t = blankTask();
+    const companyOptions = this.state.companies.map(c => `<option value="${c.id}">${UI.escapeHtml(c.name) || c.id}</option>`).join('');
+    UI.openModal(`
+      <div class="modal">
+        <h3>New Task</h3>
+        <form id="task-form" class="form-grid">
+          <label class="span-2">Title*<input required name="title" placeholder="Send proposal follow-up"></label>
+          <label>Related Company<select name="companyId"><option value="">—</option>${companyOptions}</select></label>
+          <label>Due Date<input type="date" name="dueDate"></label>
+          <label>Priority<select name="priority">${OPTIONS.taskPriority.map(p => `<option ${p === 'Medium' ? 'selected' : ''}>${p}</option>`).join('')}</select></label>
+          <label>Assigned To<select name="assignedTo">${UI.optionsHtml(OPTIONS.assignedTo, '')}</select></label>
+          <div class="modal-actions span-2">
+            <button type="button" class="btn btn-ghost" id="cancel-tform">Cancel</button>
+            <button type="submit" class="btn btn-primary">Add Task</button>
+          </div>
+        </form>
+      </div>
+    `);
+    document.getElementById('cancel-tform').onclick = () => UI.closeModal();
+    document.getElementById('task-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const updated = { ...t };
+      for (const [k, v] of fd.entries()) updated[k] = v;
+      const company = this.state.companies.find(c => c.id === updated.companyId);
+      updated.companyName = company ? company.name : '';
+      updated.version = 1;
+      await DB.tasks.put(updated);
+      this.state.tasks.unshift(updated);
+      await this.logChange({ action: 'create', entityType: 'Task', entityId: updated.id, entityName: updated.title, fullData: { ...updated } });
+      UI.toast('Task added', 'success');
+      UI.closeModal();
+      this.route('tasks');
+    });
+  },
+
+  async toggleTask(id, done) {
+    const t = this.state.tasks.find(x => x.id === id);
+    if (!t) return;
+    const before = { ...t };
+    t.status = done ? 'Completed' : 'Pending';
+    t.updatedAt = nowISO();
+    t.version = (Number(t.version) || 1) + 1;
+    await DB.tasks.put(t);
+    await this.logChange({
+      action: 'update', entityType: 'Task', entityId: t.id, entityName: t.title,
+      changes: [{ field: 'status', label: 'Status', old: before.status, new: t.status }], snapshot: before, fullData: { ...t }
+    });
+    this.route('tasks');
+  },
+
+  async deleteTask(id) {
+    const t = this.state.tasks.find(x => x.id === id);
+    const ok = await UI.confirm(`Delete task "${t?.title || id}" permanently?`, { requirePassword: true });
+    if (!ok) return;
+    await DB.tasks.delete(id);
+    this.state.tasks = this.state.tasks.filter(x => x.id !== id);
+    await this.logChange({ action: 'delete', entityType: 'Task', entityId: id, entityName: t?.title || id, snapshot: t || null, fullData: t ? { ...t } : null });
+    this.route('tasks');
+  },
+
+  // ================= FOLLOW-UP MANAGEMENT MODULE =================
+  // Self-contained addition: its own Firestore collection (followups), its own
+  // state slice (state.followups / fuView / fuFilters / fuSort / fuPage...),
+  // and its own render/wire functions below. Linked to the existing client
+  // database via companyId / contactId so every follow-up traces back to its
+  // company and decision-maker record without touching those modules.
+
+  fuToday() { return UI.todayISO(); },
+
+  fuDaysRemaining(dateStr) {
+    if (!dateStr) return null;
+    const today = new Date(this.fuToday());
+    const d = new Date(dateStr);
+    return Math.round((d - today) / 86400000);
+  },
+
+  fuIsOverdue(f) {
+    return !!(f.nextFollowUpDate && f.nextFollowUpDate < this.fuToday() && !['Completed', 'Cancelled', 'Closed'].includes(f.status));
+  },
+
+  fuEnrich(f) {
+    return { ...f, _daysRemaining: this.fuDaysRemaining(f.nextFollowUpDate), _overdue: this.fuIsOverdue(f) };
+  },
+
+  fuAll() { return this.state.followups.map(f => this.fuEnrich(f)); },
+
+  fuFindDuplicate(companyId, purpose, excludeId) {
+    return this.state.followups.find(x => x.id !== excludeId && x.companyId === companyId && x.purpose === purpose && !['Completed', 'Cancelled', 'Closed'].includes(x.status));
+  },
+
+  fuKpis() {
+    const all = this.fuAll();
+    const today = this.fuToday();
+    const in7 = UI.daysFromNow(7);
+    const open = f => !['Completed', 'Cancelled', 'Closed'].includes(f.status);
+    return {
+      total: all.length,
+      dueToday: all.filter(f => f.nextFollowUpDate === today && open(f)).length,
+      upcoming: all.filter(f => f.nextFollowUpDate && f.nextFollowUpDate > today && f.nextFollowUpDate <= in7 && open(f)).length,
+      overdue: all.filter(f => f._overdue).length,
+      completedToday: all.filter(f => f.status === 'Completed' && f.updatedAt && f.updatedAt.slice(0, 10) === today).length,
+      highPriority: all.filter(f => ['High', 'Urgent'].includes(f.priority) && open(f)).length,
+      meetings: all.filter(f => f.stage === 'Meeting Scheduled' || f.purpose === 'Schedule Meeting' || f.purpose === 'Confirm Meeting').length,
+      won: all.filter(f => f.stage === 'Won').length,
+      lost: all.filter(f => f.stage === 'Lost').length,
+    };
+  },
+
+  fuVisible() {
+    const { fuSearch, fuFilters, fuQuickFilter, fuSort } = this.state;
+    const today = this.fuToday();
+    const in7 = UI.daysFromNow(7);
+    let list = this.fuAll();
+
+    if (fuQuickFilter === 'dueToday') list = list.filter(f => f.nextFollowUpDate === today && !['Completed', 'Cancelled', 'Closed'].includes(f.status));
+    else if (fuQuickFilter === 'overdue') list = list.filter(f => f._overdue);
+    else if (fuQuickFilter === 'upcoming') list = list.filter(f => f.nextFollowUpDate && f.nextFollowUpDate > today && f.nextFollowUpDate <= in7);
+    else if (fuQuickFilter === 'completedToday') list = list.filter(f => f.status === 'Completed' && f.updatedAt && f.updatedAt.slice(0, 10) === today);
+    else if (fuQuickFilter === 'highPriority') list = list.filter(f => ['High', 'Urgent'].includes(f.priority));
+    else if (fuQuickFilter === 'meetings') list = list.filter(f => f.stage === 'Meeting Scheduled' || f.purpose === 'Schedule Meeting' || f.purpose === 'Confirm Meeting');
+    else if (fuQuickFilter === 'won') list = list.filter(f => f.stage === 'Won');
+    else if (fuQuickFilter === 'lost') list = list.filter(f => f.stage === 'Lost');
+
+    if (fuFilters.companyId) list = list.filter(f => f.companyId === fuFilters.companyId);
+    if (fuFilters.assignedTo) list = list.filter(f => f.assignedTo === fuFilters.assignedTo);
+    if (fuFilters.stage) list = list.filter(f => f.stage === fuFilters.stage);
+    if (fuFilters.status) list = list.filter(f => f.status === fuFilters.status);
+    if (fuFilters.priority) list = list.filter(f => f.priority === fuFilters.priority);
+    if (fuFilters.method) list = list.filter(f => f.method === fuFilters.method);
+    if (fuFilters.outcome) list = list.filter(f => f.outcome === fuFilters.outcome);
+    if (fuFilters.from) list = list.filter(f => f.nextFollowUpDate && f.nextFollowUpDate >= fuFilters.from);
+    if (fuFilters.to) list = list.filter(f => f.nextFollowUpDate && f.nextFollowUpDate <= fuFilters.to);
+
+    if (fuSearch) {
+      const s = fuSearch.toLowerCase();
+      list = list.filter(f => `${f.clientName} ${f.companyName} ${f.contactName} ${f.jobTitle} ${f.phone} ${f.email} ${f.subject} ${f.notes} ${f.id}`.toLowerCase().includes(s));
+    }
+
+    list.sort((a, b) => {
+      const { field, dir } = fuSort;
+      let va = a[field], vb = b[field];
+      if (field === '_daysRemaining') { va = va == null ? 99999 : va; vb = vb == null ? 99999 : vb; }
+      else { va = va ?? ''; vb = vb ?? ''; }
+      const cmp = va > vb ? 1 : va < vb ? -1 : 0;
+      return dir === 'asc' ? cmp : -cmp;
+    });
+    return list;
+  },
+
+  // ---------- MAIN PAGE ----------
+  renderFollowupMgmt() {
+    const main = document.getElementById('main');
+    const k = this.fuKpis();
+    const cardsConfig = [
+      ['total', 'Total Follow-ups', '📋', ''],
+      ['dueToday', 'Due Today', '📅', k.dueToday ? 'warn' : ''],
+      ['upcoming', 'Upcoming', '🔭', ''],
+      ['overdue', 'Overdue', '⏰', k.overdue ? 'bad' : ''],
+      ['completedToday', 'Completed Today', '✅', 'good'],
+      ['highPriority', 'High Priority', '🔥', k.highPriority ? 'bad' : ''],
+      ['meetings', 'Meetings Scheduled', '🤝', ''],
+      ['won', 'Deals Won', '🏆', 'good'],
+      ['lost', 'Deals Lost', '✕', 'bad'],
+    ];
+
+    let subviewHtml;
+    if (this.state.fuView === 'calendar') subviewHtml = this.fuCalendarHtml();
+    else if (this.state.fuView === 'analytics') subviewHtml = this.fuAnalyticsHtml();
+    else subviewHtml = this.fuTableHtml();
+
+    main.innerHTML = `
+      <div class="view-header row">
+        <div><h1>Follow-up Management</h1><p class="sub">Every opportunity, meeting, proposal and negotiation — tracked, timed, and never missed.</p></div>
+        <div class="header-actions"><button class="btn btn-primary" id="fu-add-btn">+ New Follow-up</button></div>
+      </div>
+      <div class="kpi-grid">
+        ${cardsConfig.map(([key, label, icon, tone], i) => `
+          <div class="kpi-card clickable ${this.state.fuQuickFilter === key ? 'kpi-active' : ''}" data-qf="${key}" style="animation-delay:${i * 25}ms">
+            <div class="kpi-icon">${icon}</div>
+            <div class="kpi-value ${tone}">${k[key]}</div>
+            <div class="kpi-label">${label}</div>
+          </div>`).join('')}
+      </div>
+      ${this.fuNotificationsHtml()}
+      <div class="view-tabs">
+        <div class="view-tab ${this.state.fuView === 'table' ? 'active' : ''}" data-fv="table">📋 Table</div>
+        <div class="view-tab ${this.state.fuView === 'calendar' ? 'active' : ''}" data-fv="calendar">📅 Calendar</div>
+        <div class="view-tab ${this.state.fuView === 'analytics' ? 'active' : ''}" data-fv="analytics">📊 Analytics</div>
+      </div>
+      ${subviewHtml}
+    `;
+
+    document.getElementById('fu-add-btn').onclick = () => this.openFollowupForm();
+    main.querySelectorAll('.kpi-card[data-qf]').forEach(card => {
+      card.addEventListener('click', () => {
+        const key = card.dataset.qf;
+        this.state.fuQuickFilter = this.state.fuQuickFilter === key ? '' : key;
+        this.state.fuPage = 1;
+        this.renderFollowupMgmt();
+      });
+    });
+    main.querySelectorAll('.notif-item').forEach(item => {
+      item.addEventListener('click', () => this.openFollowupForm(item.dataset.id));
+    });
+    main.querySelectorAll('.view-tab').forEach(tab => {
+      tab.addEventListener('click', () => { this.state.fuView = tab.dataset.fv; this.renderFollowupMgmt(); });
+    });
+
+    if (this.state.fuView === 'table') this.wireFuTable(main);
+    else if (this.state.fuView === 'calendar') this.wireFuCalendar(main);
+    else if (this.state.fuView === 'analytics') this.renderFuAnalyticsCharts();
+  },
+
+  // ---------- NOTIFICATIONS ----------
+  fuNotificationsHtml() {
+    const all = this.fuAll();
+    const today = this.fuToday();
+    const tomorrow = UI.daysFromNow(1);
+    const open = f => !['Completed', 'Cancelled', 'Closed'].includes(f.status);
+    const overdue = all.filter(f => f._overdue).sort((a, b) => a.nextFollowUpDate.localeCompare(b.nextFollowUpDate));
+    const dueToday = all.filter(f => f.nextFollowUpDate === today && open(f));
+    const dueTomorrow = all.filter(f => f.nextFollowUpDate === tomorrow && open(f));
+    const meetingReminders = all.filter(f => (f.stage === 'Meeting Scheduled' || f.purpose === 'Schedule Meeting' || f.purpose === 'Confirm Meeting') && f.nextFollowUpDate && f.nextFollowUpDate >= today && f.nextFollowUpDate <= tomorrow);
+    const dueReminders = all.filter(f => f.reminderDate && f.reminderDate <= today && open(f));
+
+    const items = [
+      ...overdue.map(f => ({ tone: 'bad', text: `Overdue${f._daysRemaining <= -3 ? ' (missed)' : ''}: ${f.clientName || f.companyName} — ${f.purpose}`, date: f.nextFollowUpDate, id: f.id })),
+      ...dueToday.map(f => ({ tone: 'warn', text: `Due today: ${f.clientName || f.companyName} — ${f.purpose}`, date: f.nextFollowUpDate, id: f.id })),
+      ...dueTomorrow.map(f => ({ tone: 'info', text: `Due in 1 day: ${f.clientName || f.companyName} — ${f.purpose}`, date: f.nextFollowUpDate, id: f.id })),
+      ...meetingReminders.map(f => ({ tone: 'info', text: `Meeting reminder: ${f.clientName || f.companyName}`, date: f.nextFollowUpDate, id: f.id })),
+      ...dueReminders.map(f => ({ tone: 'info', text: `Reminder${f.reminderTime ? ' at ' + f.reminderTime : ''}: ${f.clientName || f.companyName} — ${f.subject || f.purpose}`, date: f.reminderDate, id: f.id })),
+    ].slice(0, 10);
+
+    return `
+      <div class="panel" style="margin-bottom:18px">
+        <h3>🔔 Notifications <span class="count-badge">${overdue.length + dueToday.length + dueTomorrow.length + dueReminders.length}</span></h3>
+        <div class="notif-list">
+          ${items.map(n => `
+            <div class="notif-item" data-id="${n.id}">
+              <span class="notif-badge ${n.tone}"></span>
+              <span class="notif-text">${UI.escapeHtml(n.text)}</span>
+              <span class="notif-time">${UI.fmtDate(n.date)}</span>
+            </div>`).join('') || '<p class="empty-hint">All caught up — nothing needs attention right now.</p>'}
+        </div>
+      </div>`;
+  },
+
+  // ---------- TABLE VIEW ----------
+  fuTh(field, label) {
+    const { field: sf, dir } = this.state.fuSort;
+    const arrow = sf === field ? (dir === 'asc' ? ' ↑' : ' ↓') : '';
+    return `<th class="sortable fu-th" data-field="${field}">${label}${arrow}</th>`;
+  },
+
+  fuFilterSelect(field, label, options) {
+    const val = this.state.fuFilters[field];
+    return `<select class="fu-filter-select" data-field="${field}">
+      <option value="">${label}: All</option>
+      ${options.map(o => `<option value="${o}" ${o === val ? 'selected' : ''}>${o}</option>`).join('')}
+    </select>`;
+  },
+
+  fuTableHtml() {
+    const list = this.fuVisible();
+    const total = list.length;
+    const pageSize = this.state.fuPageSize;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    if (this.state.fuPage > totalPages) this.state.fuPage = totalPages;
+    const page = this.state.fuPage;
+    const pageItems = list.slice((page - 1) * pageSize, page * pageSize);
+    const f = this.state.fuFilters;
+
+    return `
+      <div class="filter-bar">
+        <select class="fu-filter-select" data-field="companyId"><option value="">Client: All</option>${this.state.companies.map(c => `<option value="${c.id}" ${c.id === f.companyId ? 'selected' : ''}>${UI.escapeHtml(c.name) || c.id}</option>`).join('')}</select>
+        ${this.fuFilterSelect('assignedTo', 'Salesperson', OPTIONS.assignedTo)}
+        ${this.fuFilterSelect('stage', 'Stage', OPTIONS.fuStage)}
+        ${this.fuFilterSelect('status', 'Status', OPTIONS.fuStatus)}
+        ${this.fuFilterSelect('priority', 'Priority', OPTIONS.fuPriority)}
+        ${this.fuFilterSelect('method', 'Method', OPTIONS.fuMethod)}
+        ${this.fuFilterSelect('outcome', 'Outcome', OPTIONS.fuOutcome)}
+        <input type="date" class="fu-filter-select" data-field="from" value="${f.from || ''}" title="Next follow-up from">
+        <input type="date" class="fu-filter-select" data-field="to" value="${f.to || ''}" title="Next follow-up to">
+        ${Object.values(f).some(Boolean) || this.state.fuQuickFilter ? '<button class="btn btn-ghost btn-sm" id="fu-clear-filters">Clear filters</button>' : ''}
+      </div>
+      <div class="export-bar">
+        <input type="text" class="fu-search" id="fu-search-input" placeholder="Search client, contact, phone, email, ID..." value="${UI.escapeHtml(this.state.fuSearch)}">
+        <button class="btn btn-ghost btn-sm" id="fu-export-xlsx">⬇ Excel</button>
+        <button class="btn btn-ghost btn-sm" id="fu-export-csv">⬇ CSV</button>
+        <button class="btn btn-ghost btn-sm" id="fu-export-pdf">⬇ PDF</button>
+        <button class="btn btn-ghost btn-sm" id="fu-print">🖨 Print</button>
+        <span class="count-badge">${total} follow-up${total === 1 ? '' : 's'}</span>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th>ID</th>
+            ${this.fuTh('clientName', 'Client Name')}
+            ${this.fuTh('companyName', 'Company')}
+            ${this.fuTh('contactName', 'Contact Person')}
+            <th>Job Title</th>
+            <th>Phone</th>
+            <th>Email</th>
+            ${this.fuTh('assignedTo', 'Assigned Rep')}
+            ${this.fuTh('stage', 'Stage')}
+            ${this.fuTh('purpose', 'Purpose')}
+            ${this.fuTh('method', 'Method')}
+            ${this.fuTh('priority', 'Priority')}
+            ${this.fuTh('status', 'Status')}
+            ${this.fuTh('lastContactDate', 'Last Contact')}
+            ${this.fuTh('nextFollowUpDate', 'Next Follow-up')}
+            ${this.fuTh('_daysRemaining', 'Days Left')}
+            <th>Next Action</th>
+            ${this.fuTh('createdAt', 'Created')}
+            ${this.fuTh('updatedAt', 'Updated')}
+            <th class="print-hide"></th>
+          </tr></thead>
+          <tbody>
+            ${pageItems.map(row => this.fuRow(row)).join('') || `<tr><td colspan="19" class="empty-cell">No follow-ups yet. <a href="#" id="fu-empty-add">Create your first one</a>.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <span>Page ${page} of ${totalPages} · ${total} total</span>
+        <button id="fu-prev-page" ${page <= 1 ? 'disabled' : ''}>← Prev</button>
+        <button id="fu-next-page" ${page >= totalPages ? 'disabled' : ''}>Next →</button>
+      </div>
+    `;
+  },
+
+  fuRow(f) {
+    const days = f._daysRemaining;
+    let daysClass = '', daysLabel = '—';
+    if (f.nextFollowUpDate) {
+      daysLabel = days === 0 ? 'Today' : days < 0 ? `${Math.abs(days)}d overdue` : `${days}d`;
+      daysClass = days < 0 ? 'overdue' : days === 0 ? 'today' : days <= 2 ? 'soon' : '';
+    }
+    return `<tr class="${f._overdue ? 'row-overdue' : ''}">
+      <td class="cell-sub">${f.id}</td>
+      <td class="cell-main">${UI.escapeHtml(f.clientName || f.companyName) || '<em>Unnamed</em>'}</td>
+      <td>${UI.escapeHtml(f.companyName) || '—'}</td>
+      <td>${UI.escapeHtml(f.contactName) || '—'}</td>
+      <td>${UI.escapeHtml(f.jobTitle) || '—'}</td>
+      <td>${UI.escapeHtml(f.phone) || '—'}</td>
+      <td>${UI.escapeHtml(f.email) || '—'}</td>
+      <td>${UI.escapeHtml(f.assignedTo) || '—'}</td>
+      <td><span class="chip stage-${(f.stage || '').replace(/\s/g, '')}">${f.stage || '—'}</span></td>
+      <td>${UI.escapeHtml(f.purpose) || '—'}</td>
+      <td>${UI.escapeHtml(f.method) || '—'}</td>
+      <td><span class="chip prio-${f.priority}">${f.priority || '—'}</span></td>
+      <td><span class="chip">${f.status || '—'}</span></td>
+      <td>${UI.fmtDate(f.lastContactDate)}</td>
+      <td class="${f._overdue ? 'text-danger' : ''}">${UI.fmtDate(f.nextFollowUpDate)}${f._overdue ? ' ⚠️' : ''}</td>
+      <td><span class="fu-days ${daysClass}">${daysLabel}</span></td>
+      <td>${UI.escapeHtml(f.nextAction) || '—'}</td>
+      <td>${UI.fmtDate(f.createdAt)}</td>
+      <td>${UI.fmtDate(f.updatedAt)}</td>
+      <td class="row-actions print-hide">
+        <button class="icon-btn fu-quick" data-id="${f.id}" title="Quick Follow-up">🔁</button>
+        <button class="icon-btn fu-copy" data-id="${f.id}" title="Copy as New">📋</button>
+        <button class="icon-btn fu-timeline" data-id="${f.id}" title="View Timeline">🕓</button>
+        <button class="icon-btn fu-edit" data-id="${f.id}" title="Edit">✎</button>
+        <button class="icon-btn fu-delete" data-id="${f.id}" title="Delete">🗑</button>
+      </td>
+    </tr>`;
+  },
+
+  wireFuTable(main) {
+    const emptyAdd = document.getElementById('fu-empty-add');
+    if (emptyAdd) emptyAdd.onclick = (e) => { e.preventDefault(); this.openFollowupForm(); };
+
+    main.querySelectorAll('.fu-filter-select').forEach(sel => {
+      sel.addEventListener('change', () => { this.state.fuFilters[sel.dataset.field] = sel.value; this.state.fuPage = 1; this.renderFollowupMgmt(); });
+    });
+    const clearBtn = document.getElementById('fu-clear-filters');
+    if (clearBtn) clearBtn.onclick = () => {
+      this.state.fuFilters = { companyId: '', assignedTo: '', stage: '', status: '', priority: '', method: '', outcome: '', from: '', to: '' };
+      this.state.fuQuickFilter = ''; this.state.fuPage = 1;
+      this.renderFollowupMgmt();
+    };
+
+    const searchInput = document.getElementById('fu-search-input');
+    searchInput.addEventListener('input', (e) => {
+      this.state.fuSearch = e.target.value;
+      this.state.fuPage = 1;
+      this.renderFollowupMgmt();
+      const el = document.getElementById('fu-search-input');
+      if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+    });
+
+    main.querySelectorAll('.fu-th').forEach(th => {
+      th.addEventListener('click', () => {
+        const fld = th.dataset.field;
+        if (this.state.fuSort.field === fld) this.state.fuSort.dir = this.state.fuSort.dir === 'asc' ? 'desc' : 'asc';
+        else this.state.fuSort = { field: fld, dir: 'asc' };
+        this.renderFollowupMgmt();
+      });
+    });
+
+    document.getElementById('fu-export-xlsx').onclick = () => this.exportFollowupsExcel();
+    document.getElementById('fu-export-csv').onclick = () => this.exportFollowupsCSV();
+    document.getElementById('fu-export-pdf').onclick = () => this.exportFollowupsPDF();
+    document.getElementById('fu-print').onclick = () => this.printFollowups();
+
+    main.querySelectorAll('.fu-quick').forEach(b => b.addEventListener('click', () => this.quickLogFollowup(b.dataset.id)));
+    main.querySelectorAll('.fu-copy').forEach(b => b.addEventListener('click', () => this.copyFollowup(b.dataset.id)));
+    main.querySelectorAll('.fu-timeline').forEach(b => b.addEventListener('click', () => this.openFollowupTimeline(b.dataset.id)));
+    main.querySelectorAll('.fu-edit').forEach(b => b.addEventListener('click', () => this.openFollowupForm(b.dataset.id)));
+    main.querySelectorAll('.fu-delete').forEach(b => b.addEventListener('click', () => this.deleteFollowup(b.dataset.id)));
+
+    const prevBtn = document.getElementById('fu-prev-page');
+    const nextBtn = document.getElementById('fu-next-page');
+    if (prevBtn) prevBtn.onclick = () => { if (this.state.fuPage > 1) { this.state.fuPage--; this.renderFollowupMgmt(); } };
+    if (nextBtn) nextBtn.onclick = () => { this.state.fuPage++; this.renderFollowupMgmt(); };
+  },
+
+  // ---------- ADD / EDIT FORM ----------
+  openFollowupForm(id, prefillData) {
+    const editing = !!id;
+    const base = editing ? this.state.followups.find(x => x.id === id) : { ...blankFollowup(), ...(prefillData || {}) };
+    if (!base) return;
+    const f = (() => {
+      const nf = { ...base };
+      if (!editing && prefillData) { nf.id = uid('F'); nf.createdAt = nowISO(); nf.updatedAt = nowISO(); nf.version = 1; nf.timeline = []; }
+      return nf;
+    })();
+
+    const contactOptions = (companyId, contactId) => this.state.contacts.filter(c => c.companyId === companyId).map(c => `<option value="${c.id}" ${c.id === contactId ? 'selected' : ''}>${UI.escapeHtml(c.name)}</option>`).join('');
+
+    UI.openModal(`
+      <div class="modal">
+        <h3>${editing ? 'Edit Follow-up' : 'New Follow-up'}${editing ? `<span class="ver-badge">Version ${f.version || 1}</span>` : ''}</h3>
+        <div id="fu-dup-warning"></div>
+        <form id="followup-mgmt-form" class="form-grid">
+          <label>Company*<select name="companyId" id="fu-company-select" required><option value="">— Select —</option>${this.state.companies.map(c => `<option value="${c.id}" ${c.id === f.companyId ? 'selected' : ''}>${UI.escapeHtml(c.name) || c.id}</option>`).join('')}</select></label>
+          <label>Client Name<input name="clientName" id="fu-client-name" value="${UI.escapeHtml(f.clientName || f.companyName)}" placeholder="Auto-filled from company"></label>
+          <label>Contact Person<select name="contactId" id="fu-contact-select"><option value="">— None / Manual —</option>${contactOptions(f.companyId, f.contactId)}</select></label>
+          <label>Job Title<input name="jobTitle" id="fu-jobtitle" value="${UI.escapeHtml(f.jobTitle)}"></label>
+          <label>Phone Number<input name="phone" id="fu-phone" value="${UI.escapeHtml(f.phone)}"></label>
+          <label>Email<input type="email" name="email" id="fu-email" value="${UI.escapeHtml(f.email)}"></label>
+          <label>Assigned Salesperson<select name="assignedTo">${UI.optionsHtml(OPTIONS.assignedTo, f.assignedTo)}</select></label>
+          <label>Opportunity Stage<select name="stage">${OPTIONS.fuStage.map(o => `<option ${o === f.stage ? 'selected' : ''}>${o}</option>`).join('')}</select></label>
+          <label>Follow-up Purpose<select name="purpose" id="fu-purpose-select">${OPTIONS.fuPurpose.map(o => `<option ${o === f.purpose ? 'selected' : ''}>${o}</option>`).join('')}</select></label>
+          <label>Follow-up Method<select name="method">${OPTIONS.fuMethod.map(o => `<option ${o === f.method ? 'selected' : ''}>${o}</option>`).join('')}</select></label>
+          <label>Priority<select name="priority">${OPTIONS.fuPriority.map(o => `<option ${o === f.priority ? 'selected' : ''}>${o}</option>`).join('')}</select></label>
+          <label>Status<select name="status">${OPTIONS.fuStatus.map(o => `<option ${o === f.status ? 'selected' : ''}>${o}</option>`).join('')}</select></label>
+          <label>Outcome<select name="outcome"><option value="">—</option>${OPTIONS.fuOutcome.map(o => `<option ${o === f.outcome ? 'selected' : ''}>${o}</option>`).join('')}</select></label>
+          <label class="span-2">Subject<input name="subject" value="${UI.escapeHtml(f.subject)}" placeholder="Short summary of this follow-up"></label>
+          <label class="span-2">Detailed Notes<textarea name="notes" rows="3" placeholder="Context, discussion points, anything useful next time...">${UI.escapeHtml(f.notes)}</textarea></label>
+          <label class="span-2">Next Action<input name="nextAction" value="${UI.escapeHtml(f.nextAction)}" placeholder="e.g. Send updated proposal by Thursday"></label>
+          <label>Last Contact Date<input type="date" name="lastContactDate" value="${f.lastContactDate || ''}"></label>
+          <label>Next Follow-up Date<input type="date" name="nextFollowUpDate" value="${f.nextFollowUpDate || ''}"></label>
+          <label>Reminder Date<input type="date" name="reminderDate" value="${f.reminderDate || ''}"></label>
+          <label>Reminder Time<input type="time" name="reminderTime" value="${f.reminderTime || ''}"></label>
+          <label>Estimated Deal Value ($)<input type="number" name="dealValue" value="${f.dealValue || 0}"></label>
+          <label>Probability %<input type="number" min="0" max="100" name="probability" value="${f.probability || 0}"></label>
+          <label>Expected Closing Date<input type="date" name="expectedClosingDate" value="${f.expectedClosingDate || ''}"></label>
+          <label class="span-2">Attachments<input type="file" id="fu-attachments" multiple></label>
+          <label class="span-2">Tags<input name="tags" value="${UI.escapeHtml(f.tags)}" placeholder="comma, separated, tags"></label>
+          <label class="span-2">Internal Notes<textarea name="internalNotes" rows="2" placeholder="Only visible to your team">${UI.escapeHtml(f.internalNotes)}</textarea></label>
+          <div class="modal-actions span-2">
+            <button type="button" class="btn btn-ghost" id="cancel-fumform">Cancel</button>
+            <button type="submit" class="btn btn-primary">${editing ? 'Save Changes' : 'Create Follow-up'}</button>
+          </div>
+        </form>
+      </div>
+    `);
+
+    const checkDup = () => {
+      const companyId = document.getElementById('fu-company-select').value;
+      const purpose = document.getElementById('fu-purpose-select').value;
+      const warnEl = document.getElementById('fu-dup-warning');
+      if (!editing && companyId && purpose) {
+        const dup = this.fuFindDuplicate(companyId, purpose, f.id);
+        warnEl.innerHTML = dup ? `<div class="dup-warning">⚠️ An open follow-up for this client with the same purpose already exists (created ${UI.fmtDate(dup.createdAt)}). You can still save — just double-check it isn't a duplicate.</div>` : '';
+      } else warnEl.innerHTML = '';
+    };
+    checkDup();
+
+    document.getElementById('fu-company-select').addEventListener('change', (e) => {
+      const company = this.state.companies.find(c => c.id === e.target.value);
+      const clientNameInput = document.getElementById('fu-client-name');
+      if (company && clientNameInput.dataset.auto !== 'false') { clientNameInput.value = company.name; clientNameInput.dataset.auto = 'true'; }
+      document.getElementById('fu-contact-select').innerHTML = `<option value="">— None / Manual —</option>${contactOptions(e.target.value, '')}`;
+      checkDup();
+    });
+    document.getElementById('fu-client-name').addEventListener('input', (e) => { e.target.dataset.auto = 'false'; });
+    document.getElementById('fu-purpose-select').addEventListener('change', checkDup);
+
+    document.getElementById('fu-contact-select').addEventListener('change', (e) => {
+      const contact = this.state.contacts.find(c => c.id === e.target.value);
+      if (contact) {
+        document.getElementById('fu-jobtitle').value = contact.jobTitle || '';
+        document.getElementById('fu-phone').value = contact.phone || '';
+        document.getElementById('fu-email').value = contact.email || '';
+        const clientNameInput = document.getElementById('fu-client-name');
+        if (clientNameInput.dataset.auto !== 'false') { clientNameInput.value = contact.name; clientNameInput.dataset.auto = 'true'; }
+      }
+    });
+
+    document.getElementById('cancel-fumform').onclick = () => UI.closeModal();
+    document.getElementById('followup-mgmt-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const before = editing ? { ...f } : null;
+      const updated = { ...f };
+      for (const [k, v] of fd.entries()) updated[k] = v;
+
+      const fileInput = document.getElementById('fu-attachments');
+      if (fileInput && fileInput.files.length) {
+        updated.attachments = [...(updated.attachments || []), ...[...fileInput.files].map(file => file.name)];
+      }
+      const company = this.state.companies.find(c => c.id === updated.companyId);
+      updated.companyName = company ? company.name : '';
+      const contact = this.state.contacts.find(c => c.id === updated.contactId);
+      if (contact) updated.contactName = contact.name;
+      updated.dealValue = Number(updated.dealValue) || 0;
+      updated.probability = Math.max(0, Math.min(100, Number(updated.probability) || 0));
+
+      if (!editing) {
+        const dup = this.fuFindDuplicate(updated.companyId, updated.purpose, updated.id);
+        if (dup) {
+          const proceed = await UI.confirm('An open follow-up for this client with the same purpose already exists. Create a duplicate anyway?', { danger: false, confirmLabel: 'Create Anyway' });
+          if (!proceed) return;
+        }
+      }
+
+      updated.updatedAt = nowISO();
+      updated.version = editing ? (Number(f.version) || 1) + 1 : 1;
+      if (!editing) updated.createdAt = updated.createdAt || nowISO();
+      updated.timeline = updated.timeline || [];
+      if (!editing) {
+        updated.timeline = [...updated.timeline, { date: nowISO(), user: updated.assignedTo || 'System', type: 'Created', notes: `Follow-up created — ${updated.purpose}` }];
+      } else {
+        const evNotes = [];
+        if (before.stage !== updated.stage) evNotes.push(`Stage: ${before.stage} → ${updated.stage}`);
+        if (before.status !== updated.status) evNotes.push(`Status: ${before.status} → ${updated.status}`);
+        if (updated.outcome && before.outcome !== updated.outcome) evNotes.push(`Outcome: ${updated.outcome}`);
+        if (evNotes.length) updated.timeline = [...updated.timeline, { date: nowISO(), user: updated.assignedTo || 'System', type: 'Update', notes: evNotes.join(' · ') }];
+      }
+
+      await DB.followups.put(updated);
+      const idx = this.state.followups.findIndex(x => x.id === updated.id);
+      if (idx >= 0) this.state.followups[idx] = updated; else this.state.followups.unshift(updated);
+      const changes = editing ? diffRecords(before, updated, FOLLOWUP_FIELD_LABELS) : [];
+      await this.logChange({
+        action: editing ? 'update' : 'create', entityType: 'Followup', entityId: updated.id,
+        entityName: updated.clientName || updated.companyName || updated.id, changes, snapshot: before, fullData: { ...updated }
+      });
+      UI.toast(`${updated.clientName || updated.companyName || 'Follow-up'} saved`, 'success');
+      UI.closeModal();
+      this.route('followupmgmt');
+    });
+  },
+
+  // ---------- QUICK FOLLOW-UP / COPY / TIMELINE / DELETE ----------
+  quickLogFollowup(id) {
+    const f = this.state.followups.find(x => x.id === id);
+    if (!f) return;
+    UI.openModal(`
+      <div class="modal modal-sm">
+        <h3>Quick Follow-up — ${UI.escapeHtml(f.clientName || f.companyName) || 'Record'}</h3>
+        <p class="modal-msg">Last contact: ${UI.fmtDate(f.lastContactDate)} · Next action: ${UI.escapeHtml(f.nextAction) || '—'}</p>
+        <form id="quick-fu-form">
+          <label class="fu-form-label">What happened?*
+            <textarea id="qfu-notes" rows="3" required placeholder="e.g. Called, discussed pricing, will send proposal tomorrow"></textarea>
+          </label>
+          <label class="fu-form-label" style="margin-top:10px">Outcome
+            <select id="qfu-outcome"><option value="">—</option>${OPTIONS.fuOutcome.map(o => `<option ${o === f.outcome ? 'selected' : ''}>${o}</option>`).join('')}</select>
+          </label>
+          <label class="fu-form-label" style="margin-top:10px">Next Follow-up Date
+            <input type="date" id="qfu-next" value="${f.nextFollowUpDate || ''}">
+          </label>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" id="cancel-qfu">Cancel</button>
+            <button type="submit" class="btn btn-primary">Log Follow-up</button>
+          </div>
+        </form>
+        ${(f.timeline || []).length ? `
+        <div class="fu-history">
+          <h4>Recent activity</h4>
+          <ul class="fu-history-list">
+            ${[...f.timeline].reverse().slice(0, 5).map(ev => `<li><span class="fu-history-date">${UI.fmtDate(ev.date)}</span><span class="fu-history-text">${UI.escapeHtml(ev.notes)}</span></li>`).join('')}
+          </ul>
+        </div>` : ''}
+      </div>
+    `);
+    document.getElementById('cancel-qfu').onclick = () => UI.closeModal();
+    document.getElementById('quick-fu-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const notes = document.getElementById('qfu-notes').value.trim();
+      const outcome = document.getElementById('qfu-outcome').value;
+      const next = document.getElementById('qfu-next').value;
+      if (!notes) return;
+      const before = { ...f };
+      f.timeline = [...(f.timeline || []), { date: nowISO(), user: f.assignedTo || 'You', type: f.method || 'Follow-up', notes }];
+      f.lastContactDate = this.fuToday();
+      if (outcome) f.outcome = outcome;
+      f.nextFollowUpDate = next || '';
+      f.status = next ? 'Rescheduled' : 'Completed';
+      f.updatedAt = nowISO();
+      f.version = (Number(f.version) || 1) + 1;
+      await DB.followups.put(f);
+      await this.logChange({
+        action: 'followup', entityType: 'Followup', entityId: f.id, entityName: f.clientName || f.companyName,
+        message: `Logged follow-up with ${f.clientName || f.companyName}: ${notes}`, snapshot: before, fullData: { ...f }
+      });
+      UI.toast('Follow-up logged', 'success');
+      UI.closeModal();
+      this.route('followupmgmt');
+    });
+  },
+
+  copyFollowup(id) {
+    const f = this.state.followups.find(x => x.id === id);
+    if (!f) return;
+    const clone = { ...f, nextFollowUpDate: '', reminderDate: '', reminderTime: '', lastContactDate: this.fuToday(), status: 'Scheduled', outcome: '', timeline: [] };
+    delete clone.id;
+    this.openFollowupForm(null, clone);
+    UI.toast('Copied previous follow-up — review the details and save', 'info');
+  },
+
+  openFollowupTimeline(id) {
+    const f = this.state.followups.find(x => x.id === id);
+    if (!f) return;
+    const events = [...(f.timeline || [])].sort((a, b) => new Date(b.date) - new Date(a.date));
+    UI.openModal(`
+      <div class="modal">
+        <h3>Timeline — ${UI.escapeHtml(f.clientName || f.companyName) || 'Follow-up'}</h3>
+        <p class="modal-msg">${events.length} activity ${events.length === 1 ? 'entry' : 'entries'} · Stage: <strong>${f.stage}</strong> · Status: <strong>${f.status}</strong></p>
+        <div class="tl-list">
+          ${events.map(ev => `
+            <div class="tl-item">
+              <div class="tl-dot"></div>
+              <div class="tl-body">
+                <div class="tl-head"><span>${UI.escapeHtml(ev.type || 'Activity')}</span><span class="tl-meta">${new Date(ev.date).toLocaleString()}</span></div>
+                <div class="tl-meta">${UI.escapeHtml(ev.user || '')}</div>
+                <div class="tl-notes">${UI.escapeHtml(ev.notes || '')}</div>
+              </div>
+            </div>`).join('') || '<p class="empty-hint">No activity logged yet.</p>'}
+        </div>
+        <div class="modal-actions"><button class="btn btn-ghost" id="close-tl">Close</button></div>
+      </div>
+    `);
+    document.getElementById('close-tl').onclick = () => UI.closeModal();
+  },
+
+  async deleteFollowup(id) {
+    const f = this.state.followups.find(x => x.id === id);
+    const ok = await UI.confirm('Delete this follow-up permanently?', { requirePassword: true });
+    if (!ok) return;
+    await DB.followups.delete(id);
+    this.state.followups = this.state.followups.filter(x => x.id !== id);
+    await this.logChange({ action: 'delete', entityType: 'Followup', entityId: id, entityName: f?.clientName || f?.companyName || id, snapshot: f || null, fullData: f ? { ...f } : null });
+    UI.toast('Follow-up deleted', 'success');
+    this.route('followupmgmt');
+  },
+
+  // ---------- CALENDAR VIEW ----------
+  fuCalendarHtml() {
+    const d = this.state.fuCalendarDate;
+    const year = d.getFullYear(), month = d.getMonth();
+    const first = new Date(year, month, 1);
+    const startDow = first.getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const today = this.fuToday();
+    const all = this.fuAll();
+    const byDate = {};
+    all.forEach(f => { if (f.nextFollowUpDate) (byDate[f.nextFollowUpDate] = byDate[f.nextFollowUpDate] || []).push(f); });
+    const dow = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    let cells = '';
+    for (let i = 0; i < startDow; i++) cells += `<div class="calendar-cell empty"></div>`;
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const items = byDate[dateStr] || [];
+      cells += `<div class="calendar-cell ${dateStr === today ? 'today' : ''}" data-date="${dateStr}">
+        <div class="calendar-daynum">${day}</div>
+        ${items.slice(0, 3).map(f => `<div class="calendar-event ${f._overdue ? 'overdue-ev' : ''}" title="${UI.escapeHtml(f.clientName || f.companyName)} — ${UI.escapeHtml(f.purpose)}">${UI.escapeHtml(f.clientName || f.companyName) || '—'}</div>`).join('')}
+        ${items.length > 3 ? `<div class="calendar-more">+${items.length - 3} more</div>` : ''}
+      </div>`;
+    }
+    return `
+      <div class="calendar-wrap">
+        <div class="calendar-head">
+          <h3>${first.toLocaleString(undefined, { month: 'long', year: 'numeric' })}</h3>
+          <div class="calendar-nav">
+            <button class="btn btn-ghost btn-sm" id="cal-prev">← Prev</button>
+            <button class="btn btn-ghost btn-sm" id="cal-today">Today</button>
+            <button class="btn btn-ghost btn-sm" id="cal-next">Next →</button>
+          </div>
+        </div>
+        <div class="calendar-grid">
+          ${dow.map(x => `<div class="calendar-dow">${x}</div>`).join('')}
+          ${cells}
+        </div>
+      </div>`;
+  },
+
+  wireFuCalendar(main) {
+    const d = this.state.fuCalendarDate;
+    document.getElementById('cal-prev').onclick = () => { this.state.fuCalendarDate = new Date(d.getFullYear(), d.getMonth() - 1, 1); this.renderFollowupMgmt(); };
+    document.getElementById('cal-next').onclick = () => { this.state.fuCalendarDate = new Date(d.getFullYear(), d.getMonth() + 1, 1); this.renderFollowupMgmt(); };
+    document.getElementById('cal-today').onclick = () => { this.state.fuCalendarDate = new Date(); this.renderFollowupMgmt(); };
+    main.querySelectorAll('.calendar-cell[data-date]').forEach(cell => {
+      cell.addEventListener('click', () => {
+        const date = cell.dataset.date;
+        this.state.fuFilters.from = date; this.state.fuFilters.to = date;
+        this.state.fuQuickFilter = ''; this.state.fuPage = 1; this.state.fuView = 'table';
+        this.renderFollowupMgmt();
+      });
+    });
+  },
+
+  // ---------- ANALYTICS VIEW ----------
+  fuAnalyticsHtml() {
+    return `
+      <div class="stat-strip" id="fu-stat-strip"></div>
+      <div class="chart-grid">
+        <div class="panel"><h3>Follow-ups per Month</h3><canvas id="fu-chart-month" height="200"></canvas></div>
+        <div class="panel"><h3>Follow-ups per Salesperson</h3><canvas id="fu-chart-rep" height="200"></canvas></div>
+        <div class="panel"><h3>Win Rate</h3><canvas id="fu-chart-win" height="200"></canvas></div>
+        <div class="panel"><h3>Opportunity Pipeline</h3><canvas id="fu-chart-pipeline" height="200"></canvas></div>
+        <div class="panel"><h3>Meetings vs Closed Deals</h3><canvas id="fu-chart-meetvsclose" height="200"></canvas></div>
+        <div class="panel"><h3>Lost Opportunities by Reason</h3><canvas id="fu-chart-lost" height="200"></canvas></div>
+      </div>
+    `;
+  },
+
+  fuBarChart(canvasId, labels, data, colorFn) {
+    Charts._destroy(canvasId);
+    const pal = Charts._palette();
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    Charts._instances[canvasId] = new Chart(ctx, {
+      type: 'bar',
+      data: { labels, datasets: [{ data, backgroundColor: labels.map((l, i) => (colorFn && colorFn(l)) || pal.series[i % pal.series.length]), borderRadius: 6 }] },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: pal.text, font: { size: 10 } } },
+          y: { grid: { color: pal.grid }, ticks: { color: pal.text, precision: 0 } }
+        }
+      }
+    });
+  },
+
+  renderFuAnalyticsCharts() {
+    const all = this.fuAll();
+    const total = all.length;
+    const completed = all.filter(f => f.status === 'Completed').length;
+    const completionRate = total ? Math.round((completed / total) * 100) : 0;
+    const closedRecords = all.filter(f => ['Won', 'Lost'].includes(f.stage) && f.createdAt);
+    const avgDays = closedRecords.length ? Math.round(closedRecords.reduce((s, f) => s + Math.max(0, (new Date(f.updatedAt) - new Date(f.createdAt)) / 86400000), 0) / closedRecords.length) : 0;
+    const won = all.filter(f => f.stage === 'Won').length;
+    const lost = all.filter(f => f.stage === 'Lost').length;
+    const winRate = (won + lost) ? Math.round((won / (won + lost)) * 100) : 0;
+
+    const stripEl = document.getElementById('fu-stat-strip');
+    if (stripEl) stripEl.innerHTML = `
+      <div class="stat-box"><div class="stat-val">${completionRate}%</div><div class="stat-lbl">Completion Rate</div></div>
+      <div class="stat-box"><div class="stat-val">${avgDays}d</div><div class="stat-lbl">Avg. Days to Close</div></div>
+      <div class="stat-box"><div class="stat-val">${winRate}%</div><div class="stat-lbl">Win Rate</div></div>
+      <div class="stat-box"><div class="stat-val">${total}</div><div class="stat-lbl">Total Follow-ups</div></div>
+    `;
+
+    const months = [...Array(6)].map((_, i) => { const dd = new Date(); dd.setMonth(dd.getMonth() - (5 - i)); return dd; });
+    const labels = months.map(dd => dd.toLocaleString(undefined, { month: 'short' }));
+    const createdM = months.map(dd => all.filter(f => f.createdAt && new Date(f.createdAt).getMonth() === dd.getMonth() && new Date(f.createdAt).getFullYear() === dd.getFullYear()).length);
+    const completedM = months.map(dd => all.filter(f => f.status === 'Completed' && f.updatedAt && new Date(f.updatedAt).getMonth() === dd.getMonth() && new Date(f.updatedAt).getFullYear() === dd.getFullYear()).length);
+    Charts.renderMonthlyTrend('fu-chart-month', labels, createdM, completedM);
+
+    const repCounts = this.countBy(all, 'assignedTo', OPTIONS.assignedTo);
+    this.fuBarChart('fu-chart-rep', Object.keys(repCounts), Object.values(repCounts));
+
+    Charts.renderLeadSources('fu-chart-win', { Won: won, Lost: lost, Open: Math.max(0, total - won - lost) });
+
+    const stageCounts = this.countBy(all, 'stage', OPTIONS.fuStage);
+    this.fuBarChart('fu-chart-pipeline', Object.keys(stageCounts), Object.values(stageCounts), (l) => l === 'Lost' ? '#E0654F' : l === 'Won' ? '#5FCB93' : undefined);
+
+    const meetings = all.filter(f => f.stage === 'Meeting Scheduled' || f.purpose === 'Schedule Meeting' || f.purpose === 'Confirm Meeting').length;
+    this.fuBarChart('fu-chart-meetvsclose', ['Meetings Scheduled', 'Deals Won'], [meetings, won]);
+
+    const lostOutcomes = this.countBy(all.filter(f => f.stage === 'Lost'), 'outcome', []);
+    const lostLabels = Object.keys(lostOutcomes).length ? Object.keys(lostOutcomes) : ['No data'];
+    const lostData = Object.keys(lostOutcomes).length ? Object.values(lostOutcomes) : [0];
+    this.fuBarChart('fu-chart-lost', lostLabels, lostData);
+  },
+
+  // ---------- EXPORT / PRINT ----------
+  fuExportRows(list) {
+    const headers = ['Follow-up ID', 'Client Name', 'Company Name', 'Contact Person', 'Job Title', 'Phone Number', 'Email', 'Assigned Sales Representative', 'Opportunity Stage', 'Follow-up Purpose', 'Follow-up Method', 'Priority', 'Status', 'Last Contact Date', 'Next Follow-up Date', 'Days Remaining', 'Next Action', 'Created Date', 'Last Updated'];
+    const rows = list.map(f => [
+      f.id, f.clientName || f.companyName, f.companyName, f.contactName, f.jobTitle, f.phone, f.email,
+      f.assignedTo, f.stage, f.purpose, f.method, f.priority, f.status,
+      UI.fmtDate(f.lastContactDate), UI.fmtDate(f.nextFollowUpDate),
+      f._daysRemaining == null ? '' : f._daysRemaining, f.nextAction, UI.fmtDate(f.createdAt), UI.fmtDate(f.updatedAt)
+    ]);
+    return { headers, rows };
+  },
+
+  exportFollowupsExcel() {
+    const { headers, rows } = this.fuExportRows(this.fuVisible());
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Follow-ups');
+    const fname = `Followups_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    XLSX.writeFile(wb, fname);
+    this.logChange({ action: 'export', entityType: 'Data', entityName: fname, message: `Exported Follow-up Management data to ${fname}` });
+    UI.toast('Exported to Excel', 'success');
+  },
+
+  exportFollowupsCSV() {
+    const { headers, rows } = this.fuExportRows(this.fuVisible());
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    const csv = XLSX.utils.sheet_to_csv(ws);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `Followups_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    UI.toast('Exported to CSV', 'success');
+  },
+
+  exportFollowupsPDF() {
+    const { headers, rows } = this.fuExportRows(this.fuVisible());
+    if (!window.jspdf) { UI.toast('PDF library failed to load — check your connection', 'error'); return; }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'landscape' });
+    doc.setFontSize(14);
+    doc.text('Follow-up Management — Export', 14, 14);
+    doc.autoTable({ head: [headers], body: rows, startY: 20, styles: { fontSize: 7 } });
+    doc.save(`Followups_${new Date().toISOString().slice(0, 10)}.pdf`);
+    UI.toast('Exported to PDF', 'success');
+  },
+
+  printFollowups() {
+    window.print();
+  },
+
+  // ---------- HISTORY / ACTIVITY LOG ----------
+  renderHistory() {
+    const f = this.state.historyFilter;
+    const list = this.filteredActivities();
+    const rangeLabels = { all: 'All Time', today: 'Today', yesterday: 'Yesterday', '7d': 'Last 7 Days', '30d': 'Last 30 Days', month: 'This Month' };
+    const main = document.getElementById('main');
+    main.innerHTML = `
+      <div class="view-header">
+        <h1>History</h1>
+        <p class="sub">${list.length} of ${this.state.activities.length} events — every add, edit, delete, import and export is tracked automatically.</p>
+      </div>
+      <div class="filter-bar">
+        <input type="text" id="history-search" class="filter-select" style="min-width:220px" placeholder="Search history..." value="${UI.escapeHtml(f.search)}">
+        <select class="filter-select" id="history-range">
+          ${Object.entries(rangeLabels).map(([r, label]) => `<option value="${r}" ${f.range === r ? 'selected' : ''}>${label}</option>`).join('')}
+        </select>
+        <select class="filter-select" id="history-entity">
+          <option value="">Entity: All</option>
+          ${['Company', 'Contact', 'Task', 'Data', 'Settings'].map(t => `<option value="${t}" ${f.entityType === t ? 'selected' : ''}>${t}</option>`).join('')}
+        </select>
+        <select class="filter-select" id="history-action">
+          <option value="">Action: All</option>
+          ${['create', 'update', 'delete', 'restore', 'undo', 'import', 'export', 'settings', 'followup'].map(a => `<option value="${a}" ${f.action === a ? 'selected' : ''}>${this.actionLabel(a)}</option>`).join('')}
+        </select>
+        ${(f.search || f.entityType || f.action || f.range !== 'all') ? '<button class="btn btn-ghost btn-sm" id="history-clear">Clear filters</button>' : ''}
+      </div>
+      <div class="history-list">
+        ${list.map(a => this.historyCard(a)).join('') || '<p class="empty-hint">No activity matches these filters.</p>'}
+      </div>
+    `;
+    document.getElementById('history-search').addEventListener('input', (e) => { this.state.historyFilter.search = e.target.value; this.renderHistory(); });
+    document.getElementById('history-range').addEventListener('change', (e) => { this.state.historyFilter.range = e.target.value; this.renderHistory(); });
+    document.getElementById('history-entity').addEventListener('change', (e) => { this.state.historyFilter.entityType = e.target.value; this.renderHistory(); });
+    document.getElementById('history-action').addEventListener('change', (e) => { this.state.historyFilter.action = e.target.value; this.renderHistory(); });
+    const clearBtn = document.getElementById('history-clear');
+    if (clearBtn) clearBtn.onclick = () => { this.state.historyFilter = { range: 'all', entityType: '', action: '', search: '' }; this.renderHistory(); };
+    main.querySelectorAll('.hist-undo').forEach(b => b.addEventListener('click', () => this.undoActivity(b.dataset.id)));
+    main.querySelectorAll('.hist-restore').forEach(b => b.addEventListener('click', () => this.restoreActivity(b.dataset.id)));
+  },
+
+  filteredActivities() {
+    const f = this.state.historyFilter;
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return this.state.activities.filter(a => {
+      const ts = new Date(a.timestamp);
+      if (f.range === 'today' && ts < today) return false;
+      if (f.range === 'yesterday') {
+        const y0 = new Date(today); y0.setDate(y0.getDate() - 1);
+        if (!(ts >= y0 && ts < today)) return false;
+      }
+      if (f.range === '7d') { const d = new Date(today); d.setDate(d.getDate() - 7); if (ts < d) return false; }
+      if (f.range === '30d') { const d = new Date(today); d.setDate(d.getDate() - 30); if (ts < d) return false; }
+      if (f.range === 'month') { const now = new Date(); if (ts.getMonth() !== now.getMonth() || ts.getFullYear() !== now.getFullYear()) return false; }
+      if (f.entityType && a.entityType !== f.entityType) return false;
+      if (f.action && a.action !== f.action) return false;
+      if (f.search) {
+        const hay = `${a.entityName} ${a.message} ${(a.changes || []).map(c => `${c.field} ${c.old} ${c.new}`).join(' ')}`.toLowerCase();
+        if (!hay.includes(f.search.toLowerCase())) return false;
+      }
+      return true;
+    });
+  },
+
+  actionLabel(a) {
+    return { create: 'Created', update: 'Updated', delete: 'Deleted', restore: 'Restored',
+      undo: 'Undone', import: 'Imported', export: 'Exported', settings: 'Settings', followup: 'Follow-up Logged' }[a] || a;
+  },
+
+  fullDataFields(entityType, data) {
+    if (!data) return [];
+    const labelMaps = { Company: COMPANY_FIELD_LABELS, Contact: CONTACT_FIELD_LABELS, Task: TASK_FIELD_LABELS };
+    const labels = labelMaps[entityType] || {};
+    const skip = new Set(['id', 'companyId', '_relatedContacts', 'version', 'createdAt', 'updatedAt']);
+    const keys = Object.keys(labels).length ? Object.keys(labels) : Object.keys(data).filter(k => !skip.has(k));
+    return keys.filter(k => !skip.has(k)).map(k => ({
+      label: labels[k] || k,
+      value: data[k] === '' || data[k] == null ? '—' : (typeof data[k] === 'boolean' ? (data[k] ? 'Yes' : 'No') : String(data[k]))
+    }));
+  },
+
+  historyCard(a) {
+    const d = new Date(a.timestamp);
+    const dateStr = d.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' });
+    const timeStr = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    const canUndo = !a.undone && (a.action === 'update' || a.action === 'create') && a.snapshot !== undefined && (a.action !== 'create' || a.entityId);
+    const canRestore = !a.undone && a.action === 'delete' && !!a.snapshot;
+    return `<div class="history-card">
+      <div class="hist-time"><div>${dateStr}</div><div class="hist-time-sub">${timeStr}</div></div>
+      <div class="hist-body">
+        <div class="hist-head">
+          <span class="chip hist-badge badge-${a.action}">${this.actionLabel(a.action)}</span>
+          <span class="hist-entity">${UI.escapeHtml(a.entityType || '')}${a.entityName ? ': ' + UI.escapeHtml(a.entityName) : ''}</span>
+          ${a.undone ? '<span class="chip">Reverted</span>' : ''}
+        </div>
+        ${a.changes && a.changes.length ? `<div class="hist-diffs">${a.changes.map(c => `
+          <div class="hist-diff"><span class="hist-diff-field">${UI.escapeHtml(c.label)}</span><span class="hist-diff-old">${UI.escapeHtml(c.old) || '—'}</span><span class="hist-diff-arrow">→</span><span class="hist-diff-new">${UI.escapeHtml(c.new) || '—'}</span></div>`).join('')}</div>`
+          : `<div class="hist-msg">${UI.escapeHtml(a.message)}</div>`}
+        ${a.fullData ? `<details class="hist-fulldata">
+          <summary>View full data</summary>
+          <div class="hist-fulldata-grid">
+            ${this.fullDataFields(a.entityType, a.fullData).map(f => `
+              <div class="hist-fulldata-row"><span class="hist-fulldata-label">${UI.escapeHtml(f.label)}</span><span class="hist-fulldata-value">${UI.escapeHtml(f.value)}</span></div>`).join('')}
+          </div>
+        </details>` : ''}
+        <div class="hist-foot">
+          <span class="hist-id">ID: ${UI.escapeHtml(a.entityId || a.id)}</span>
+          ${canUndo ? `<button class="btn btn-ghost btn-sm hist-undo" data-id="${a.id}">Undo</button>` : ''}
+          ${canRestore ? `<button class="btn btn-ghost btn-sm hist-restore" data-id="${a.id}">Restore</button>` : ''}
+        </div>
+      </div>
+    </div>`;
+  },
+
+  async removeEntity(entityType, id) {
+    if (entityType === 'Company') {
+      await DB.companies.delete(id);
+      this.state.companies = this.state.companies.filter(x => x.id !== id);
+    } else if (entityType === 'Contact') {
+      await DB.contacts.delete(id);
+      this.state.contacts = this.state.contacts.filter(x => x.id !== id);
+    } else if (entityType === 'Task') {
+      await DB.tasks.delete(id);
+      this.state.tasks = this.state.tasks.filter(x => x.id !== id);
+    }
+  },
+
+  async restoreEntity(entityType, snapshot) {
+    if (!snapshot) return;
+    if (entityType === 'Company') {
+      const { _relatedContacts, ...company } = snapshot;
+      await DB.companies.put(company);
+      const idx = this.state.companies.findIndex(x => x.id === company.id);
+      if (idx >= 0) this.state.companies[idx] = company; else this.state.companies.unshift(company);
+      if (_relatedContacts && _relatedContacts.length) {
+        for (const rc of _relatedContacts) {
+          await DB.contacts.put(rc);
+          const cidx = this.state.contacts.findIndex(x => x.id === rc.id);
+          if (cidx >= 0) this.state.contacts[cidx] = rc; else this.state.contacts.unshift(rc);
+        }
+      }
+    } else if (entityType === 'Contact') {
+      await DB.contacts.put(snapshot);
+      const idx = this.state.contacts.findIndex(x => x.id === snapshot.id);
+      if (idx >= 0) this.state.contacts[idx] = snapshot; else this.state.contacts.unshift(snapshot);
+    } else if (entityType === 'Task') {
+      await DB.tasks.put(snapshot);
+      const idx = this.state.tasks.findIndex(x => x.id === snapshot.id);
+      if (idx >= 0) this.state.tasks[idx] = snapshot; else this.state.tasks.unshift(snapshot);
+    }
+  },
+
+  async undoActivity(activityId) {
+    const act = this.state.activities.find(a => a.id === activityId);
+    if (!act || act.undone) return;
+    try {
+      if (act.action === 'create') {
+        await this.removeEntity(act.entityType, act.entityId);
+      } else if (act.action === 'update' && act.snapshot) {
+        await this.restoreEntity(act.entityType, act.snapshot);
+      } else {
+        return;
+      }
+      act.undone = true;
+      await DB.activities.put(act);
+      await this.logChange({
+        action: 'undo', entityType: act.entityType, entityId: act.entityId, entityName: act.entityName,
+        message: `Reverted change to ${act.entityType} "${act.entityName}"`
+      });
+      UI.toast('Change undone', 'success');
+      this.route('history');
+    } catch (err) {
+      console.error(err);
+      UI.toast('Could not undo that change', 'error');
+    }
+  },
+
+  async restoreActivity(activityId) {
+    const act = this.state.activities.find(a => a.id === activityId);
+    if (!act || act.undone || act.action !== 'delete' || !act.snapshot) return;
+    try {
+      await this.restoreEntity(act.entityType, act.snapshot);
+      act.undone = true;
+      await DB.activities.put(act);
+      await this.logChange({
+        action: 'restore', entityType: act.entityType, entityId: act.entityId, entityName: act.entityName,
+        message: `Restored ${act.entityType} "${act.entityName}"`
+      });
+      UI.toast(`${act.entityType} restored`, 'success');
+      this.route('history');
+    } catch (err) {
+      console.error(err);
+      UI.toast('Could not restore that record', 'error');
+    }
+  },
+
+  // ---------- TEAM MEMBERS ----------
+  async addTeamMember(rawName) {
+    const name = (rawName || '').trim();
+    if (!name) { UI.toast('Enter a name first', 'error'); return; }
+    if (OPTIONS.assignedTo.some(n => n.toLowerCase() === name.toLowerCase())) {
+      UI.toast('That name is already on the team', 'error');
+      return;
+    }
+    OPTIONS.assignedTo.push(name);
+    await DB.setSetting('team', OPTIONS.assignedTo.slice());
+    await this.logChange({ action: 'settings', entityType: 'Data', entityName: name, message: `Added team member "${name}"` });
+    UI.toast(`${name} added`, 'success');
+    this.route('settings');
+  },
+
+  async removeTeamMember(name) {
+    const ok = await UI.confirm(`Remove "${name}" from the team? Companies/tasks already assigned to them keep the name, but it won't be selectable anymore.`, {
+      title: 'Remove team member', confirmLabel: 'Remove', requirePassword: true
+    });
+    if (!ok) return;
+    const idx = OPTIONS.assignedTo.indexOf(name);
+    if (idx >= 0) OPTIONS.assignedTo.splice(idx, 1);
+    await DB.setSetting('team', OPTIONS.assignedTo.slice());
+    await this.logChange({ action: 'settings', entityType: 'Data', entityName: name, message: `Removed team member "${name}"` });
+    UI.toast(`${name} removed`, 'success');
+    this.route('settings');
+  },
+
+  // ---------- SETTINGS / BACKUP ----------
+  renderSettings() {
+    const main = document.getElementById('main');
+    main.innerHTML = `
+      <div class="view-header"><h1>Settings & Backup</h1><p class="sub">Data is shared live via Firebase — every teammate sees the same records in real time.</p></div>
+      <div class="settings-grid">
+        <div class="panel">
+          <h3>Backup</h3>
+          <p class="panel-desc">Download a full JSON snapshot of every company, contact, and task. Keep this safe — it's the fastest way to restore everything.</p>
+          <button class="btn btn-primary" id="download-backup">Download Backup (JSON)</button>
+        </div>
+        <div class="panel">
+          <h3>Restore</h3>
+          <p class="panel-desc">Restoring replaces all current data with the contents of the backup file.</p>
+          <button class="btn btn-ghost" id="restore-backup">Restore from JSON</button>
+          <input type="file" id="restore-file" accept=".json" hidden>
+        </div>
+        <div class="panel">
+          <h3>Excel Sync</h3>
+          <p class="panel-desc">Import merges by ID (existing records update, new ones are added — nothing is deleted). Export writes a workbook with the same sheet names and headers as your original CRM.xlsx.</p>
+          <button class="btn btn-primary" id="settings-export">Export to Excel</button>
+          <button class="btn btn-ghost" id="settings-csv">Export Companies (CSV)</button>
+        </div>
+        <div class="panel">
+          <h3>Team Members</h3>
+          <p class="panel-desc">These names appear in every "Assigned To" dropdown across the CRM. Removing a name is password-protected.</p>
+          <div class="team-add-row">
+            <input type="text" id="team-new-name" placeholder="e.g. Sara Hassan" maxlength="60">
+            <button class="btn btn-primary btn-sm" id="team-add-btn">Add</button>
+          </div>
+          <ul class="team-list">
+            ${OPTIONS.assignedTo.map(name => `
+              <li class="team-item">
+                <span>${UI.escapeHtml(name)}</span>
+                <button class="icon-btn team-remove" data-name="${UI.escapeHtml(name)}" title="Remove">🗑</button>
+              </li>`).join('') || '<li class="team-empty">No team members yet.</li>'}
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Danger Zone</h3>
+          <p class="panel-desc">Permanently erase all CRM data for everyone — this is the shared team database, not just this browser.</p>
+          <button class="btn btn-danger" id="wipe-data">Erase All Data</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('download-backup').onclick = async () => {
+      const snap = await DB.exportAll();
+      const blob = new Blob([JSON.stringify(snap, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const fname = `crm_backup_${new Date().toISOString().slice(0, 10)}.json`;
+      const a = document.createElement('a'); a.href = url; a.download = fname; a.click();
+      URL.revokeObjectURL(url);
+      await this.logChange({ action: 'export', entityType: 'Data', entityName: fname, message: `Downloaded full backup (${fname})` });
+      UI.toast('Backup downloaded', 'success');
+    };
+    document.getElementById('restore-backup').onclick = () => document.getElementById('restore-file').click();
+    document.getElementById('restore-file').addEventListener('change', async (e) => {
+      const file = e.target.files[0]; if (!file) return;
+      const ok = await UI.confirm('Restoring will replace ALL current data for everyone with this backup. Continue?');
+      if (!ok) { e.target.value = ''; return; }
+      const text = await file.text();
+      try {
+        const snap = JSON.parse(text);
+        if (!snap || typeof snap !== 'object') throw new Error('Invalid backup structure');
+        await DB.importAll(snap);
+        await this.reloadAll();
+        await this.logChange({ action: 'restore', entityType: 'Data', entityName: file.name, message: `Restored full backup from ${file.name}` });
+        UI.toast('Backup restored', 'success');
+        this.route('dashboard');
+      } catch (err) { console.error(err); UI.toast('Invalid backup file — could not parse JSON', 'error'); }
+      e.target.value = '';
+    });
+    const teamAddBtn = document.getElementById('team-add-btn');
+    const teamInput = document.getElementById('team-new-name');
+    teamAddBtn.onclick = () => this.addTeamMember(teamInput.value);
+    teamInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') this.addTeamMember(teamInput.value); });
+    main.querySelectorAll('.team-remove').forEach(btn => {
+      btn.addEventListener('click', () => this.removeTeamMember(btn.dataset.name));
+    });
+    document.getElementById('settings-export').onclick = () => this.handleExport();
+    document.getElementById('settings-csv').onclick = () => Excel.exportCSV();
+    document.getElementById('wipe-data').onclick = async () => {
+      const ok = await UI.confirm('This permanently erases every company, contact, and task for everyone on the team. There is no undo unless you have a backup.', { confirmLabel: 'Erase Everything', requirePassword: true });
+      if (!ok) return;
+      await Promise.all([DB.companies.clear(), DB.contacts.clear(), DB.tasks.clear(), DB.activities.clear(), DB.followups.clear()]);
+      await this.reloadAll();
+      UI.toast('All data erased', 'success');
+      this.route('dashboard');
+    };
+  },
+
+  // ---------- Import / Export handlers (global toolbar) ----------
+  async handleImport(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const parsed = await Excel.readFile(file);
+      const result = await Excel.mergeImport(parsed);
+      await this.reloadAll();
+      await this.logChange({
+        action: 'import', entityType: 'Data', entityName: file.name,
+        message: `Imported ${result.companies.added} new / ${result.companies.updated} updated companies, ${result.contacts.added} new / ${result.contacts.updated} updated contacts from ${file.name}`
+      });
+      UI.toast(`Imported: ${result.companies.added} new / ${result.companies.updated} updated companies, ${result.contacts.added} new / ${result.contacts.updated} updated contacts`, 'success');
+      this.route(this.state.view);
+    } catch (err) {
+      console.error(err);
+      UI.toast('Could not read that file — check it matches the CRM format', 'error');
+    }
+    e.target.value = '';
+  },
+
+  async handleExport() {
+    try {
+      const fname = await Excel.exportWorkbook();
+      await this.logChange({ action: 'export', entityType: 'Data', entityName: fname, message: `Exported data to ${fname}` });
+      UI.toast(`Exported ${fname}`, 'success');
+    } catch (err) {
+      console.error(err);
+      UI.toast('Export failed', 'error');
+    }
+  }
+};
+
+if (FIREBASE_CONFIGURED && !firebaseInitError) {
+  document.addEventListener('DOMContentLoaded', () => App.init());
+}
+
+
+</script>
+</body>
+</html>
